@@ -1,0 +1,120 @@
+#pragma once
+
+#include "Graphics.h"
+#include "Windows.h"
+#include "d3d11.h"
+#include <dxgi1_2.h>
+#include <string>
+#include <vector>
+#include <DirectXMath.h>
+
+#pragma comment (lib, "d3d11.lib")
+
+#define D3DCALL(x) if(x != S_OK) { std::string s = "D3D call fail at line " + std::to_string(__LINE__) + " in file " + std::string(__FILE__) + std::string("\n"); OutputDebugString(s.c_str()); }
+
+#define MAX_SPRITES 4096
+
+int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
+
+struct SpriteConstant
+{
+	uint32_t tc_start[2];
+	uint32_t tc_size[2];
+	DirectX::XMFLOAT2 tc_offset;
+	uint32_t padding[2];
+};
+
+class winGraphics : Graphics
+{
+public:
+	winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShow);
+	virtual void setWindow(int width, int height, std::string name);
+	virtual bool shouldExit();
+	virtual void swap();
+	virtual void startLoad();
+	virtual void endLoad();
+	virtual int loadSprite(std::string name, bool centered);
+
+	virtual void startUpdateSprites();
+	virtual void startUpdateSpriteLookup();
+	virtual void startUpdatePalette();
+private:
+	HINSTANCE hInstance;
+	HINSTANCE hPrevInst;
+	LPSTR lpCmdLine;
+	int nShow;
+
+	HWND mainWindow;
+
+	ID3D11Device* device;
+	ID3D11DeviceContext* context;
+	IDXGISwapChain* swapChain;
+	ID3D11Texture2D* backTex;
+	ID3D11Texture2D* indexTex;
+	ID3D11Texture2D* tilesTex;
+	ID3D11Texture2D* tilemapTex;
+	ID3D11Texture2D* spritesTex;
+	ID3D11Texture2D* spriteLookupTex;
+	ID3D11Texture1D* paletteTex;
+	ID3D11RenderTargetView* backRTV;
+	ID3D11RenderTargetView* indexRTV;
+	ID3D11ShaderResourceView* indexRV;
+	ID3D11ShaderResourceView* paletteRV;
+	ID3D11ShaderResourceView* tilesRV;
+	ID3D11ShaderResourceView* tilemapRV;
+	ID3D11ShaderResourceView* spritesRV;
+	ID3D11ShaderResourceView* spriteLookupRV;
+
+	D3D11_VIEWPORT viewport;
+
+	ID3D11DepthStencilState* depthStencilStateOff;
+
+	ID3D11Buffer* quadsIndexBuffer;
+	ID3D11Buffer* quadsVertexBuffer;
+
+	ID3D11Buffer* spritesVertexBuffer;
+	ID3D11Buffer* spritesIndexBuffer;
+	ID3D11Buffer* spritesInfoBuffer;
+	ID3D11Buffer* spritesConstantBuffer;
+
+	ID3D11VertexShader* spritesVertexShader;
+	ID3D11InputLayout* spritesInputLayout;
+	ID3D11PixelShader* spritesPixelShader;
+	
+	ID3D11VertexShader* tilesVertexShader;
+	ID3D11InputLayout* tilesInputLayout;
+	ID3D11PixelShader* tilesPixelShader;
+
+	ID3D11VertexShader* indexedVertexShader;
+	ID3D11InputLayout* indexedInputLayout;
+	ID3D11PixelShader* indexedPixelShader;
+
+	__int64 intervalFrequency;
+	__int64 intervalCounter;
+
+	bool exitGame;
+
+	void createWindow(std::string name);
+	void createDevice();
+	void createBackbuffer();
+	void createIndexBuffer();
+	void createViewport();
+	void createPalette();
+	void createTilemap();
+	void createTiles();
+	
+	void loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DESC* input_element_description, int num_elements, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout);
+	void loadPixelShader(std::string filename, ID3D11PixelShader** pixel_shader);
+	void loadShaders();
+	void loadBuffers();
+	void callSprites();
+	void callTiles();
+	void callIndexed();
+	void getMessages();
+	void mapSprites();
+	void mapPalette();
+	void mapLookup();
+
+	std::vector<std::string> spritesToLoad;
+	std::vector<bool> spritesToLoadCentered;
+};

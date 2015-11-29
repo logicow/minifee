@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{9891f062-f4db-4c71-b17c-a8303665f84c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\windows">
+      <UniqueIdentifier>{9ebec245-b80d-44b9-94cf-8747603430c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\all">
+      <UniqueIdentifier>{b4c14c54-9a94-4195-8a7b-24251f83803f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Minifee">
+      <UniqueIdentifier>{d378bc54-7c0e-44a8-aa30-51e81a9a9da9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Minifee\shaders">
+      <UniqueIdentifier>{e6d27b70-19ec-4608-ad4a-1a873a46f3f8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="winGraphics.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="winMain.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\Minifee</Filter>
+    </ClCompile>
+    <ClCompile Include="picopng.cpp">
+      <Filter>Source Files\Engine\all</Filter>
+    </ClCompile>
+    <ClCompile Include="dxDescriptions.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="winGraphics.h">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Source Files\Engine\all</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Source Files\Minifee</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseMath.h">
+      <Filter>Source Files\Engine\all</Filter>
+    </ClInclude>
+    <ClInclude Include="dxDescriptions.h">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\tilemaps_ps.hlsl">
+      <Filter>Source Files\Minifee\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\tilemaps_vs.hlsl">
+      <Filter>Source Files\Minifee\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\indexed_to_rgba_ps.hlsl">
+      <Filter>Source Files\Minifee\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\indexed_to_rgba_vs.hlsl">
+      <Filter>Source Files\Minifee\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\sprite_lookup_ps.hlsl">
+      <Filter>Source Files\Minifee\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\sprite_lookup_vs.hlsl">
+      <Filter>Source Files\Minifee\shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
