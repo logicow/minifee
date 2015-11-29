@@ -161,6 +161,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="BaseMath.h" />
+    <ClInclude Include="graphicsTypes.h" />
     <ClInclude Include="winGraphics.h" />
     <ClInclude Include="dxDescriptions.h" />
   </ItemGroup>

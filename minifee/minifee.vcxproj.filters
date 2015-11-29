@@ -62,6 +62,9 @@
     <ClInclude Include="dxDescriptions.h">
       <Filter>Source Files\Engine\windows</Filter>
     </ClInclude>
+    <ClInclude Include="graphicsTypes.h">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\tilemaps_ps.hlsl">

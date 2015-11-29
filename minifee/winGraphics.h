@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics.h"
+#include "graphicsTypes.h"
 #include "Windows.h"
 #include "d3d11.h"
 #include <dxgi1_2.h>
@@ -12,17 +13,7 @@
 
 #define D3DCALL(x) if(x != S_OK) { std::string s = "D3D call fail at line " + std::to_string(__LINE__) + " in file " + std::string(__FILE__) + std::string("\n"); OutputDebugString(s.c_str()); }
 
-#define MAX_SPRITES 4096
-
 int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
-
-struct SpriteConstant
-{
-	uint32_t tc_start[2];
-	uint32_t tc_size[2];
-	DirectX::XMFLOAT2 tc_offset;
-	uint32_t padding[2];
-};
 
 class winGraphics : Graphics
 {

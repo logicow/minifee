@@ -1,15 +1,6 @@
 #pragma once
 #include <string>
-#include <DirectXMath.h>
-
-struct SpriteVertex
-{
-	DirectX::XMFLOAT2 pos;
-	uint32_t sprite_index;
-	uint8_t sprite_color;
-	uint8_t sprite_flags;
-	uint16_t sprite_padding;
-};
+#include "graphicsTypes.h"
 
 class Graphics
 {

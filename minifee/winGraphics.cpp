@@ -33,16 +33,9 @@ LRESULT WINAPI WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 HWND createAndAdjustWindow(HINSTANCE hInstance, std::string name, int width, int height)
 {
-	WNDCLASSEX wc = {
-		sizeof(WNDCLASSEX), CS_VREDRAW | CS_HREDRAW | CS_OWNDC,
-		WndProc, 0, 0, hInstance, NULL, NULL, (HBRUSH)(COLOR_WINDOW + 1),
-		NULL, "DHCLASS", NULL };
-
-	RegisterClassEx(&wc);
-
+	RegisterClassEx(&getWindowClassEx(WndProc, hInstance));
 	RECT rect = getRect(0, 0, width, height);
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
-
 	return CreateWindow("DHCLASS", name.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, NULL);
 }
 
@@ -97,46 +90,38 @@ void winGraphics::createTiles()
 	D3DCALL(device->CreateShaderResourceView(tilesTex, &getTilesRVDesc(), &tilesRV));
 }
 
-void winGraphics::loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DESC* input_element_description, int num_elements, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout)
+void loadFile(std::vector<unsigned char>& buffer, const std::string& filename) //designed for loading files from hard disk in an std::vector
 {
-	std::string path = "../data/shaders/" + filename + ".cso";
-
-	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+	std::ifstream file(filename.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
 	std::streamsize size = 0;
 	if (file.seekg(0, std::ios::end).good()) size = file.tellg();
 	if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
 
 	if (size <= 0) {
-		OutputDebugString("shader not found");
+		OutputDebugString("file not found");
+		buffer.clear();
+		return;
 	}
+	buffer.resize((size_t)size);
+	file.read((char*)(&buffer[0]), size);
+}
 
+void winGraphics::loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DESC* input_element_description, int num_elements, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout)
+{
+	std::string path = "../data/shaders/" + filename + ".cso";
 	std::vector<unsigned char> fileData;
-	fileData.resize((size_t)size);
-	file.read((char*)(&fileData[0]), size);
-
-	D3DCALL(device->CreateVertexShader(&fileData[0], (SIZE_T)size, NULL, vertex_shader));
-	D3DCALL(device->CreateInputLayout(input_element_description, num_elements, &fileData[0], (SIZE_T)size, input_layout));
+	loadFile(fileData, path);
+	D3DCALL(device->CreateVertexShader(&fileData[0], (SIZE_T)fileData.size(), NULL, vertex_shader));
+	D3DCALL(device->CreateInputLayout(input_element_description, num_elements, &fileData[0], (SIZE_T)fileData.size(), input_layout));
 }
 
 
 void winGraphics::loadPixelShader(std::string filename, ID3D11PixelShader** pixel_shader)
 {
 	std::string path = "../data/shaders/" + filename + ".cso";
-
-	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
-	std::streamsize size = 0;
-	if (file.seekg(0, std::ios::end).good()) size = file.tellg();
-	if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
-
-	if (size <= 0) {
-		OutputDebugString("shader not found");
-	}
-
 	std::vector<unsigned char> fileData;
-	fileData.resize((size_t)size);
-	file.read((char*)(&fileData[0]), size);
-
-	D3DCALL(device->CreatePixelShader(&fileData[0], (SIZE_T)size, NULL, pixel_shader));
+	loadFile(fileData, path);
+	D3DCALL(device->CreatePixelShader(&fileData[0], (SIZE_T)fileData.size(), NULL, pixel_shader));
 }
 
 void winGraphics::loadShaders()
@@ -154,56 +139,17 @@ void winGraphics::loadShaders()
 void winGraphics::loadBuffers()
 {
 	std::vector<unsigned char> bufferData;
-	bufferData = getQuadsIndexData();
+	getQuadsIndexData(bufferData);
 	D3DCALL(device->CreateBuffer(&getQuadsIndexBufferDesc(), &getDataDesc(bufferData), &quadsIndexBuffer));
 
-	bufferData = getQuadsVertexData();
+	getQuadsVertexData(bufferData);
 	D3DCALL(device->CreateBuffer(&getQuadsVertexBufferDesc(), &getDataDesc(bufferData), &quadsVertexBuffer));
 
-	bufferData.resize((size_t)MAX_SPRITES * sizeof(DirectX::XMFLOAT2) * 4);
-	void* bufferDataPtr = (void*)&bufferData[0];
-	for (int i = 0; i < MAX_SPRITES; i++) {
-		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 0] = DirectX::XMFLOAT2(0.0f, 0.0f);
-		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 1] = DirectX::XMFLOAT2(1.0f, 0.0f);
-		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 2] = DirectX::XMFLOAT2(0.0f, 1.0f);
-		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 3] = DirectX::XMFLOAT2(1.0f, 1.0f);
-	}
-
-	D3D11_SUBRESOURCE_DATA bufferDataDesc;
-	bufferDataDesc.pSysMem = bufferDataPtr;
-
-	D3D11_BUFFER_DESC buffer_description;
-	ZeroMemory(&buffer_description, sizeof(buffer_description));
-	buffer_description.ByteWidth = MAX_SPRITES * sizeof(SpriteVertex);
-	buffer_description.Usage = D3D11_USAGE_IMMUTABLE;
-	buffer_description.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	buffer_description.CPUAccessFlags = 0;
-	buffer_description.MiscFlags = 0;
-	D3DCALL(device->CreateBuffer(&buffer_description, &bufferDataDesc, &spritesVertexBuffer));
+	getSpritesVertexData(bufferData);
+	D3DCALL(device->CreateBuffer(&getSpritesVertexBufferDesc(), &getDataDesc(bufferData), &spritesVertexBuffer));
 	
-	//TODO set sprites index data
-	for (int i = 0; i < MAX_SPRITES; i++) {
-		((uint16_t*)bufferDataPtr)[i * 6 + 0] = i * 4 + 0;
-		((uint16_t*)bufferDataPtr)[i * 6 + 1] = i * 4 + 1;
-		((uint16_t*)bufferDataPtr)[i * 6 + 2] = i * 4 + 2;
-		((uint16_t*)bufferDataPtr)[i * 6 + 3] = i * 4 + 1;
-		((uint16_t*)bufferDataPtr)[i * 6 + 4] = i * 4 + 3;
-		((uint16_t*)bufferDataPtr)[i * 6 + 5] = i * 4 + 2;
-	}
-	//bufferDataDesc.pSysMem = bufferDataPtr;
-
-	ZeroMemory(&buffer_description, sizeof(buffer_description));
-	buffer_description.ByteWidth = MAX_SPRITES * 6 * 2;
-	buffer_description.Usage = D3D11_USAGE_IMMUTABLE;
-	buffer_description.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	buffer_description.CPUAccessFlags = 0;
-	buffer_description.MiscFlags = 0;
-	D3DCALL(device->CreateBuffer(&buffer_description, &bufferDataDesc, &spritesIndexBuffer));
-
-	context->ClearState();
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	context->OMSetDepthStencilState(depthStencilStateOff, 0);
-	context->RSSetViewports(1, &viewport);
+	getSpritesIndexData(bufferData);
+	D3DCALL(device->CreateBuffer(&getSpritesIndexBufferDesc(), &getDataDesc(bufferData), &spritesIndexBuffer));
 }
 
 void winGraphics::createViewport()
@@ -215,6 +161,11 @@ void winGraphics::createViewport()
 	viewport.TopLeftY = 0;
 	viewport.MaxDepth = 1.0f;
 	viewport.MinDepth = 0.0f;
+
+	context->ClearState();
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->OMSetDepthStencilState(depthStencilStateOff, 0);
+	context->RSSetViewports(1, &viewport);
 }
 
 
@@ -348,24 +299,6 @@ void winGraphics::startLoad()
 	spritesToLoad.clear();
 }
 
-void loadFile(std::vector<unsigned char>& buffer, const std::string& filename) //designed for loading files from hard disk in an std::vector
-{
-	std::ifstream file(filename.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
-
-	//get filesize
-	std::streamsize size = 0;
-	if (file.seekg(0, std::ios::end).good()) size = file.tellg();
-	if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
-
-	//read contents of the file into the vector
-	if (size > 0)
-	{
-		buffer.resize((size_t)size);
-		file.read((char*)(&buffer[0]), size);
-	}
-	else buffer.clear();
-}
-
 unsigned long upper_power_of_two(unsigned long v)
 {
 	v--;
@@ -392,18 +325,8 @@ void winGraphics::endLoad()
 	for (int i = 0; i < (int)spritesToLoad.size(); i++)	{
 		std::string path = "../data/sprites/" + spritesToLoad[i] + ".png";
 
-		std::ifstream file(path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
-		std::streamsize size = 0;
-		if (file.seekg(0, std::ios::end).good()) size = file.tellg();
-		if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
-
-		if (size <= 0) {
-			//ERROR
-		}
-
 		std::vector<unsigned char> pngData;
-		pngData.resize((size_t)size);
-		file.read((char*)(&pngData[0]), size);
+		loadFile(pngData, path);
 
 		unsigned long spriteWidth;
 		unsigned long spriteHeight;
@@ -470,7 +393,7 @@ void winGraphics::endLoad()
 		}
 
 		if (marginLeft + marginRight >= spriteWidth || marginTop + marginBottom >= spriteHeight) {
-			//what are we doing here
+			OutputDebugString("Can't load image, it is all zeroes.");
 		}
 
 		spriteDataTable.push_back(spriteData);
@@ -530,7 +453,7 @@ void winGraphics::endLoad()
 		int lastFill = fillAtX.size() - 1;
 
 		if (lastFill < 0) {
-			//Error
+			OutputDebugString("can't fit all pictures in atlas");
 		}
 
 		while (!fit && index < (int)spriteIndexTable.size())
@@ -568,84 +491,29 @@ void winGraphics::endLoad()
 
 	realHeight = upper_power_of_two(realHeight);
 
-	unsigned long sprTexDataSize = 1024 * realHeight;
-
 	std::vector<unsigned char> sprTexData;
-	sprTexData.resize((size_t)sprTexDataSize);
-	ZeroMemory((void*)&sprTexData[0], sprTexDataSize);
+	sprTexData.resize((size_t) 1024 * realHeight);
+	ZeroMemory((void*)&sprTexData[0], 1024 * realHeight);
 
 	for (int i = 0; i < (int)spriteIndexTable.size(); i++) {
 		for (int y = 0; y < (int)spriteHeightTable[i]; y++) {
 			for (int x = 0; x < (int)spriteWidthTable[i]; x++) {
 				int realWidth = spriteWidthTable[i] + spriteMarginLeftTable[i] + spriteMarginRightTable[i];
-				sprTexData[(spriteYTable[i] + y) * 1024 + spriteXTable[i] + x] = spriteDataTable[i][(y + spriteMarginTopTable[i]) * realWidth + x + spriteMarginLeftTable[i]];
+				sprTexData[(spriteYTable[i] + y) * 1024 + spriteXTable[i] + x] = 
+					spriteDataTable[i][(y + spriteMarginTopTable[i]) * realWidth + x + spriteMarginLeftTable[i]];
 			}
 		}
 	}
 
-	D3D11_TEXTURE2D_DESC texDesc;
-	ZeroMemory(&texDesc, sizeof(texDesc));
-	texDesc.Width = 1024;
-	texDesc.Height = realHeight;
-	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_R8_UINT;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.CPUAccessFlags = 0;
-	texDesc.MiscFlags = 0;
+	D3DCALL(device->CreateTexture2D(&getSpritesTexDesc(realHeight), &getDataDesc(sprTexData, 1024), &spritesTex));
+	D3DCALL(device->CreateShaderResourceView(spritesTex, &getSpritesRVDesc(), &spritesRV));
 
-	D3D11_SUBRESOURCE_DATA texDataDesc;
-	texDataDesc.pSysMem = &sprTexData[0];
-	texDataDesc.SysMemPitch = 1024;
-	texDataDesc.SysMemSlicePitch = 0;
-	D3DCALL(device->CreateTexture2D(&texDesc, &texDataDesc, &spritesTex));
+	D3DCALL(device->CreateTexture2D(&getSpriteLookupTexDesc(), NULL, &spriteLookupTex));
+	D3DCALL(device->CreateShaderResourceView(spriteLookupTex, &getSpriteLookupRVDesc(), &spriteLookupRV));
 
-	D3D11_SHADER_RESOURCE_VIEW_DESC rvDesc;
-	rvDesc.Format = DXGI_FORMAT_R8_UINT;
-	rvDesc.Texture2D.MipLevels = 1;
-	rvDesc.Texture2D.MostDetailedMip = 0;
-	rvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	device->CreateShaderResourceView(spritesTex, &rvDesc, &spritesRV);
-
-	ZeroMemory(&texDesc, sizeof(texDesc));
-	texDesc.Width = 256;
-	texDesc.Height = 256;
-	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_R8_UINT;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Usage = D3D11_USAGE_DYNAMIC;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	texDesc.MiscFlags = 0;
-
-	D3DCALL(device->CreateTexture2D(&texDesc, NULL, &spriteLookupTex));
-
-	rvDesc.Format = DXGI_FORMAT_R8_UINT;
-	rvDesc.Texture2D.MipLevels = 1;
-	rvDesc.Texture2D.MostDetailedMip = 0;
-	rvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	device->CreateShaderResourceView(spriteLookupTex, &rvDesc, &spriteLookupRV);
-
-	D3D11_BUFFER_DESC buffer_description;
-	ZeroMemory(&buffer_description, sizeof(buffer_description));
-	buffer_description.ByteWidth = 1024 * sizeof(SpriteConstant);//spriteIndexTable.size() * sizeof(SpriteConstant);
-	buffer_description.Usage = D3D11_USAGE_IMMUTABLE;
-	buffer_description.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	buffer_description.CPUAccessFlags = 0;
-	buffer_description.MiscFlags = 0;
-
-	std::vector<unsigned char> bufferData;
-	bufferData.resize((size_t)1024 * sizeof(SpriteConstant)); //spriteIndexTable.size() * sizeof(SpriteConstant));
-	void* bufferDataPtr = (void*)&bufferData[0];
-
-	D3D11_SUBRESOURCE_DATA bufferDataDesc;
-	bufferDataDesc.pSysMem = bufferDataPtr;
-	bufferDataDesc.SysMemPitch = 1024 * sizeof(SpriteConstant); //spriteIndexTable.size() * sizeof(SpriteConstant);
+	std::vector<unsigned char> atlasBufferData;
+	atlasBufferData.resize((size_t)1024 * sizeof(SpriteConstant));
+	void* bufferDataPtr = (void*)&atlasBufferData[0];
 
 	for (int i = 0; i < (int)spriteIndexTable.size(); i++) {
 		((SpriteConstant*)bufferDataPtr)[i].tc_size[0] = (uint32_t)spriteWidthTable[i];
@@ -665,16 +533,9 @@ void winGraphics::endLoad()
 		((SpriteConstant*)bufferDataPtr)[i].padding[1] = 0;
 	}
 
-	D3DCALL(device->CreateBuffer(&buffer_description, &bufferDataDesc, &spritesConstantBuffer));
+	D3DCALL(device->CreateBuffer(&getSpritesAtlasBufferDesc(), &getDataDesc(atlasBufferData), &spritesConstantBuffer));
 
-	ZeroMemory(&buffer_description, sizeof(buffer_description));
-	buffer_description.ByteWidth = MAX_SPRITES * sizeof(SpriteVertex);
-	buffer_description.Usage = D3D11_USAGE_DYNAMIC;
-	buffer_description.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	buffer_description.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	buffer_description.MiscFlags = 0;
-
-	D3DCALL(device->CreateBuffer(&buffer_description, NULL, &spritesInfoBuffer));
+	D3DCALL(device->CreateBuffer(&getSpritesInfoBufferDesc(), NULL, &spritesInfoBuffer));
 
 	spritesToLoad.clear();
 	spritesToLoadCentered.clear();
