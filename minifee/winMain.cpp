@@ -2,11 +2,13 @@
 
 #include "Game.h"
 #include "winGraphics.h"
+#include "winGamepad.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	winGraphics graphics(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-	Game game((Graphics*)&graphics);
+	winGamepad gamepad;
+	Game game((Graphics*)&graphics, (Gamepad*)&gamepad);
 
 	game.run();
 

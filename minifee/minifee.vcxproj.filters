@@ -45,6 +45,9 @@
     <ClCompile Include="dxDescriptions.cpp">
       <Filter>Source Files\Engine\windows</Filter>
     </ClCompile>
+    <ClCompile Include="winGamepad.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winGraphics.h">
@@ -62,7 +65,10 @@
     <ClInclude Include="dxDescriptions.h">
       <Filter>Source Files\Engine\windows</Filter>
     </ClInclude>
-    <ClInclude Include="graphicsTypes.h">
+    <ClInclude Include="Gamepad.h">
+      <Filter>Source Files\Engine\all</Filter>
+    </ClInclude>
+    <ClInclude Include="winGamepad.h">
       <Filter>Source Files\Engine\windows</Filter>
     </ClInclude>
   </ItemGroup>

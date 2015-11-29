@@ -153,15 +153,17 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="picopng.cpp" />
+    <ClCompile Include="winGamepad.cpp" />
     <ClCompile Include="winGraphics.cpp" />
     <ClCompile Include="dxDescriptions.cpp" />
     <ClCompile Include="winMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Gamepad.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="BaseMath.h" />
-    <ClInclude Include="graphicsTypes.h" />
+    <ClInclude Include="winGamepad.h" />
     <ClInclude Include="winGraphics.h" />
     <ClInclude Include="dxDescriptions.h" />
   </ItemGroup>
