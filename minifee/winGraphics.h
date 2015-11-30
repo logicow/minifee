@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <DirectXMath.h>
+#include "Config.h"
 
 #pragma comment (lib, "d3d11.lib")
 
@@ -17,7 +18,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
 class winGraphics : Graphics
 {
 public:
-	winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShow);
+	winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShow, Config *config);
 	virtual void setWindow(int width, int height, std::string name);
 	virtual bool shouldExit();
 	virtual void swap();
@@ -33,6 +34,11 @@ private:
 	HINSTANCE hPrevInst;
 	LPSTR lpCmdLine;
 	int nShow;
+	Config *config;
+
+	int backBufferWidth;
+	int backBufferHeight;
+	bool backBufferFullscreen;
 
 	HWND mainWindow;
 
@@ -84,7 +90,7 @@ private:
 
 	bool exitGame;
 
-	void createWindow(std::string name);
+	void createWindow(int gameWidth, int gameHeight, std::string name);
 	void createDevice();
 	void createBackbuffer();
 	void createIndexBuffer();

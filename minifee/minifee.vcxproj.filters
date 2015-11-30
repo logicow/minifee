@@ -48,6 +48,9 @@
     <ClCompile Include="winGamepad.cpp">
       <Filter>Source Files\Engine\windows</Filter>
     </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Source Files\Engine\all</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winGraphics.h">
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="winGamepad.h">
       <Filter>Source Files\Engine\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Source Files\Engine\all</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

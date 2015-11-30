@@ -37,7 +37,7 @@ void Game::update()
 		graphics->spritePtr[i].sprite_index = 1;
 	}
 
-	graphics->spritePtr[0].pos = DirectX::XMFLOAT2(px, py);
+	graphics->spritePtr[0].pos = DirectX::XMFLOAT2((float)px, (float)py);
 	graphics->spritePtr[0].sprite_color = 1;
 	graphics->spritePtr[0].sprite_flags = 0;
 	graphics->spritePtr[0].sprite_index = 0;

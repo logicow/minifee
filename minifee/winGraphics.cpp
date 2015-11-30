@@ -3,12 +3,13 @@
 #include <iostream>
 #include <fstream>
 
-winGraphics::winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShow)
+winGraphics::winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShow, Config *config)
 {
 	this->hInstance = hInstance;
 	this->hPrevInst = hPrevInst;
 	this->lpCmdLine = lpCmdLine;
 	this->nShow = nShow;
+	this->config = config;
 
 	exitGame = false;
 	spritePtr = nullptr;
@@ -31,17 +32,84 @@ LRESULT WINAPI WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return(DefWindowProc(hwnd, msg, wParam, lParam));
 }
 
-HWND createAndAdjustWindow(HINSTANCE hInstance, std::string name, int width, int height)
+HWND createAndAdjustWindow(HINSTANCE hInstance, std::string name, int width, int height, bool fullscreen)
 {
 	RegisterClassEx(&getWindowClassEx(WndProc, hInstance));
 	RECT rect = getRect(0, 0, width, height);
-	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
+	if (!fullscreen) {
+		AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
+	}
 	return CreateWindow("DHCLASS", name.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, NULL);
 }
 
-void winGraphics::createWindow(std::string name)
+void winGraphics::createWindow(int gameWidth, int gameHeight, std::string name)
 {
-	mainWindow = createAndAdjustWindow(hInstance, name, 960, 600);
+	int width = 0;
+	int height = 0;
+	bool fullscreen = false;
+	if (config->vars["fullscreen"]) {
+		width = (int)config->vars["fullscreen_x"];
+		height = (int)config->vars["fullscreen_y"];
+		fullscreen = true;
+	}
+	else {
+		int xMax = (int)config->vars["window_x_max"];
+		int yMax = (int)config->vars["window_y_max"];
+		if (config->vars["window_integer"]) {
+			int x_mult = 1;
+			while ((x_mult + 1) * gameWidth <= xMax) {
+				x_mult += 1;
+			}
+
+			int y_mult = 1;
+			while ((y_mult + 1) * gameHeight <= yMax) {
+				y_mult += 1;
+			}
+
+			if (config->vars["window_keep_aspect"]) {
+				if (x_mult < y_mult) {
+					y_mult = x_mult;
+				}
+				else if (y_mult < x_mult) {
+					x_mult = y_mult;
+				}
+			}
+			width = x_mult * gameWidth;
+			height = y_mult * gameHeight;
+		}
+		else {
+			if (config->vars["window_keep_aspect"]) {
+				int fullHorizWidth = (int)config->vars["window_x_max"];
+				int fullHorizHeight = fullHorizWidth * gameHeight / gameWidth;
+				int fullVertHeight = (int)config->vars["window_y_max"];
+				int fullVertWidth = fullVertHeight * gameWidth / gameHeight;
+				if (fullHorizHeight > fullVertHeight) {
+					width = fullVertWidth;
+					height = fullVertHeight;
+				}
+				else {
+					width = fullHorizWidth;
+					height = fullHorizHeight;
+				}
+			}
+			else {
+				width = (int)config->vars["window_x_max"];
+				height = (int)config->vars["window_y_max"];
+			}
+		}
+	}
+	if (width <= 0) {
+		width = gameWidth;
+	}
+	if (height <= 0) {
+		height = gameHeight;
+	}
+
+	backBufferWidth = width;
+	backBufferHeight = height;
+	backBufferFullscreen = fullscreen;
+
+	mainWindow = createAndAdjustWindow(hInstance, name, width, height, fullscreen);
 	ShowWindow(mainWindow, nShow);
 	UpdateWindow(mainWindow);
 }
@@ -51,8 +119,8 @@ void winGraphics::createDevice()
 	D3D_FEATURE_LEVEL reqLevel = D3D_FEATURE_LEVEL_11_0;
 	D3D_FEATURE_LEVEL level;
 
-	DXGI_MODE_DESC bufferDesc = getSwapChainBufferDesc(960, 600, getSwapChainRefreshRate());
-	DXGI_SWAP_CHAIN_DESC swapChainDesc = getSwapChainDesc(bufferDesc, mainWindow, getSwapChainSampleDesc(), true);
+	DXGI_MODE_DESC bufferDesc = getSwapChainBufferDesc(backBufferWidth, backBufferHeight, getSwapChainRefreshRate());
+	DXGI_SWAP_CHAIN_DESC swapChainDesc = getSwapChainDesc(bufferDesc, mainWindow, getSwapChainSampleDesc(), !backBufferFullscreen);
 
 	D3DCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, &reqLevel, 1,
 		D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, &level, &context));
@@ -67,7 +135,7 @@ void winGraphics::createBackbuffer()
 
 void winGraphics::createIndexBuffer()
 {
-	D3DCALL(device->CreateTexture2D(&getIndexTexDesc(960, 600), NULL, &indexTex));
+	D3DCALL(device->CreateTexture2D(&getIndexTexDesc(backBufferWidth, backBufferHeight), NULL, &indexTex));
 	D3DCALL(device->CreateRenderTargetView(indexTex, &getIndexRTVDesc(), &indexRTV));
 	D3DCALL(device->CreateShaderResourceView(indexTex, &getIndexRVDesc(), &indexRV));
 }
@@ -155,8 +223,8 @@ void winGraphics::loadBuffers()
 void winGraphics::createViewport()
 {
 	ZeroMemory(&viewport, sizeof(viewport));
-	viewport.Width = (float)960;
-	viewport.Height = (float)600;
+	viewport.Width = (float)backBufferWidth;
+	viewport.Height = (float)backBufferHeight;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MaxDepth = 1.0f;
@@ -171,7 +239,7 @@ void winGraphics::createViewport()
 
 void winGraphics::setWindow(int width, int height, std::string name)
 {
-	createWindow(name);
+	createWindow(width, height, name);
 	createDevice();
 	createBackbuffer();
 	createIndexBuffer();
