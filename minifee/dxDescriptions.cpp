@@ -1,4 +1,6 @@
 #include "dxDescriptions.h"
+#include <iostream>
+#include <fstream>
 
 WNDCLASSEX getWindowClassEx(WNDPROC WndProc, HINSTANCE hInstance)
 {
@@ -400,4 +402,20 @@ void getSpritesIndexData(std::vector<unsigned char> &buffer)
 		((uint16_t*)bufferDataPtr)[i * 6 + 4] = i * 4 + 3;
 		((uint16_t*)bufferDataPtr)[i * 6 + 5] = i * 4 + 2;
 	}
+}
+
+void loadFile(std::vector<unsigned char>& buffer, const std::string& filename) //designed for loading files from hard disk in an std::vector
+{
+	std::ifstream file(filename.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+	std::streamsize size = 0;
+	if (file.seekg(0, std::ios::end).good()) size = file.tellg();
+	if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
+
+	if (size <= 0) {
+		OutputDebugString("file not found");
+		buffer.clear();
+		return;
+	}
+	buffer.resize((size_t)size);
+	file.read((char*)(&buffer[0]), size);
 }

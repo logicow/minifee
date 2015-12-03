@@ -1,4 +1,4 @@
-fullscreen = true
+fullscreen = false
 fullscreen_x = 1920
 fullscreen_y = 1080
 window_x_max = 1200

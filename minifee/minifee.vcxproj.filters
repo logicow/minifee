@@ -51,6 +51,9 @@
     <ClCompile Include="Config.cpp">
       <Filter>Source Files\Engine\all</Filter>
     </ClCompile>
+    <ClCompile Include="winGraphicsSprites.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winGraphics.h">

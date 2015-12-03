@@ -102,6 +102,7 @@ private:
 	void loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DESC* input_element_description, int num_elements, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout);
 	void loadPixelShader(std::string filename, ID3D11PixelShader** pixel_shader);
 	void loadShaders();
+	void loadShadersSprites();
 	void loadBuffers();
 	void callSprites();
 	void callTiles();
@@ -110,6 +111,7 @@ private:
 	void mapSprites();
 	void mapPalette();
 	void mapLookup();
+	void endLoadSprites();
 
 	std::vector<std::string> spritesToLoad;
 	std::vector<bool> spritesToLoadCentered;

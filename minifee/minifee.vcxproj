@@ -157,6 +157,7 @@
     <ClCompile Include="winGamepad.cpp" />
     <ClCompile Include="winGraphics.cpp" />
     <ClCompile Include="dxDescriptions.cpp" />
+    <ClCompile Include="winGraphicsSprites.cpp" />
     <ClCompile Include="winMain.cpp" />
   </ItemGroup>
   <ItemGroup>

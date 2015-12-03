@@ -42,3 +42,4 @@ void getQuadsIndexData(std::vector<unsigned char> &buffer);
 void getQuadsVertexData(std::vector<unsigned char> &buffer);
 void getSpritesVertexData(std::vector<unsigned char> &buffer);
 void getSpritesIndexData(std::vector<unsigned char> &buffer);
+void loadFile(std::vector<unsigned char>& buffer, const std::string& filename);
