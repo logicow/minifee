@@ -54,6 +54,9 @@
     <ClCompile Include="winGraphicsSprites.cpp">
       <Filter>Source Files\Engine\windows</Filter>
     </ClCompile>
+    <ClCompile Include="winSynth.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winGraphics.h">
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Source Files\Engine\all</Filter>
+    </ClInclude>
+    <ClInclude Include="winSynth.h">
+      <Filter>Source Files\Engine\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

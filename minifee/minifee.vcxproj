@@ -159,6 +159,7 @@
     <ClCompile Include="dxDescriptions.cpp" />
     <ClCompile Include="winGraphicsSprites.cpp" />
     <ClCompile Include="winMain.cpp" />
+    <ClCompile Include="winSynth.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="winGamepad.h" />
     <ClInclude Include="winGraphics.h" />
     <ClInclude Include="dxDescriptions.h" />
+    <ClInclude Include="winSynth.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\indexed_to_rgba_ps.hlsl">

@@ -47,6 +47,7 @@ void Game::update()
 	
 }
 
+#include "winSynth.h"
 int Game::run()
 {
 	graphics->setWindow(320, 200, "Minifee");
@@ -55,6 +56,9 @@ int Game::run()
 	graphics->loadSprite("small", false);
 	graphics->loadSprite("title", false);
 	graphics->endLoad();
+
+	winSynth synth;
+	synth.start();
 
 	graphics->startUpdatePalette();
 	for (int i = 0; i < 256; i++) {
