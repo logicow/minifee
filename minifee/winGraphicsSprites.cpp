@@ -71,17 +71,29 @@ void winGraphics::endLoadSprites()
 	std::vector<unsigned long> spriteMarginBottomTable;
 	std::vector<int> spriteIndexTable;
 
+	std::string previousFile = "";
+	std::vector<unsigned char> spriteData;
+	unsigned long spriteWidth;
+	unsigned long spriteHeight;
+
 	for (int i = 0; i < (int)spritesToLoad.size(); i++) {
-		std::string path = "../data/sprites/" + spritesToLoad[i] + ".png";
+		if (spritesToLoad[i] != previousFile) {
+			previousFile = spritesToLoad[i];
 
-		std::vector<unsigned char> pngData;
-		loadFile(pngData, path);
+			std::string path = "../data/sprites/" + spritesToLoad[i] + ".png";
 
-		unsigned long spriteWidth;
-		unsigned long spriteHeight;
+			std::vector<unsigned char> pngData;
+			loadFile(pngData, path);
 
-		std::vector<unsigned char> spriteData;
-		decodePNG(spriteData, spriteWidth, spriteHeight, &pngData[0], (unsigned long)pngData.size(), false);
+			decodePNG(spriteData, spriteWidth, spriteHeight, &pngData[0], (unsigned long)pngData.size(), false);
+		}
+		
+		if (spritesToLoadWidth[i] <= 0 || spritesToLoadWidth[i] > (int)spriteWidth - spritesToLoadX[i]) {
+			spritesToLoadWidth[i] = spriteWidth - spritesToLoadX[i];
+		}
+		if (spritesToLoadHeight[i] <= 0 || spritesToLoadHeight[i] > (int)spriteHeight - spritesToLoadY[i]) {
+			spritesToLoadHeight[i] = spriteHeight - spritesToLoadY[i];
+		}
 
 		unsigned long marginTop;
 		unsigned long marginBottom;
@@ -90,7 +102,7 @@ void winGraphics::endLoadSprites()
 
 		bool found;
 		found = false;
-		marginTop = 0;
+		marginTop = spritesToLoadY[i];
 		while (!found && marginTop < spriteHeight) {
 			for (unsigned long x = 0; x < spriteWidth; x++) {
 				if (spriteData[marginTop * spriteWidth + x] != 0) {
@@ -103,7 +115,7 @@ void winGraphics::endLoadSprites()
 		}
 
 		found = false;
-		marginBottom = 0;
+		marginBottom = spriteHeight - spritesToLoadHeight[i] - spritesToLoadY[i];
 		while (!found && marginBottom < spriteHeight) {
 			for (unsigned long x = 0; x < spriteWidth; x++) {
 				if (spriteData[(spriteHeight - marginBottom - 1) * spriteWidth + x] != 0) {
@@ -116,7 +128,7 @@ void winGraphics::endLoadSprites()
 		}
 
 		found = false;
-		marginLeft = 0;
+		marginLeft = spritesToLoadX[i];
 		while (!found && marginLeft < spriteWidth) {
 			for (unsigned long y = 0; y < spriteHeight; y++) {
 				if (spriteData[y * spriteWidth + marginLeft] != 0) {
@@ -129,7 +141,7 @@ void winGraphics::endLoadSprites()
 		}
 
 		found = false;
-		marginRight = 0;
+		marginRight = spriteWidth - spritesToLoadWidth[i] - spritesToLoadX[i];
 		while (!found && marginRight < spriteWidth) {
 			for (unsigned long y = 0; y < spriteHeight; y++) {
 				if (spriteData[y * spriteWidth + (spriteWidth - marginRight - 1)] != 0) {
@@ -269,9 +281,9 @@ void winGraphics::endLoadSprites()
 		((SpriteConstant*)bufferDataPtr)[i].tc_size[1] = (uint32_t)spriteHeightTable[i];
 		((SpriteConstant*)bufferDataPtr)[i].tc_start[0] = (uint32_t)spriteXTable[i];
 		((SpriteConstant*)bufferDataPtr)[i].tc_start[1] = (uint32_t)spriteYTable[i];
-		float offsetX = 0.0f;
-		float offsetY = 0.0f;
-		if (spritesToLoadCentered.at(i)) {
+		float offsetX = -(float)spritesToLoadX[i];
+		float offsetY = -(float)spritesToLoadY[i];
+		if (spritesToLoadCentered[i]) {
 			float width = (float)(spriteWidthTable[i] + spriteMarginLeftTable[i] + spriteMarginRightTable[i]);
 			float height = (float)(spriteHeightTable[i] + spriteMarginTopTable[i] + spriteMarginBottomTable[i]);
 			offsetX -= width*0.5f;
@@ -318,5 +330,21 @@ int winGraphics::loadSprite(std::string name, bool centered)
 	int spriteIndex = spritesToLoad.size();
 	spritesToLoad.push_back(name);
 	spritesToLoadCentered.push_back(centered);
+	spritesToLoadX.push_back(0);
+	spritesToLoadY.push_back(0);
+	spritesToLoadWidth.push_back(-1);
+	spritesToLoadHeight.push_back(-1);
+	return spriteIndex;
+}
+
+int winGraphics::loadSpriteRect(std::string name, int x, int y, int width, int height, bool centered)
+{
+	int spriteIndex = spritesToLoad.size();
+	spritesToLoad.push_back(name);
+	spritesToLoadCentered.push_back(centered);
+	spritesToLoadX.push_back(x);
+	spritesToLoadY.push_back(y);
+	spritesToLoadWidth.push_back(width);
+	spritesToLoadHeight.push_back(height);
 	return spriteIndex;
 }

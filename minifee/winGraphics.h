@@ -25,6 +25,7 @@ public:
 	virtual void startLoad();
 	virtual void endLoad();
 	virtual int loadSprite(std::string name, bool centered);
+	virtual int loadSpriteRect(std::string name, int x, int y, int width, int height, bool centered);
 
 	virtual void startUpdateSprites();
 	virtual void startUpdateSpriteLookup();
@@ -115,4 +116,8 @@ private:
 
 	std::vector<std::string> spritesToLoad;
 	std::vector<bool> spritesToLoadCentered;
+	std::vector<int> spritesToLoadX;
+	std::vector<int> spritesToLoadY;
+	std::vector<int> spritesToLoadWidth;
+	std::vector<int> spritesToLoadHeight;
 };

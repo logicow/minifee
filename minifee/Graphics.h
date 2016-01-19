@@ -37,6 +37,7 @@ public:
 	virtual void endLoad() = 0;
 
 	virtual int loadSprite(std::string name, bool centered) = 0;
+	virtual int loadSpriteRect(std::string name, int x, int y, int width, int height, bool centered) = 0;
 
 	virtual void startUpdateSprites() = 0;
 	virtual void startUpdateSpriteLookup() = 0;

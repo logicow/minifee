@@ -32,11 +32,15 @@ Config::Config()
 	int startLine = 0;
 	while (!done) {
 		int nextLine = fileString.find_first_of('\n', startLine);
-		if (nextLine <= startLine) {
+
+		if (nextLine < startLine) {
 			nextLine = buffer.size() + 1;
 			done = true;
 		}
-		std::string line = fileString.substr(startLine, nextLine - startLine - 1);
+		std::string line = fileString.substr(startLine, nextLine - startLine);
+		if (line.size() > 0 && line[line.size() - 1] == '\r') {
+			line = line.substr(0, line.size() - 1);
+		}
 		std::transform(line.begin(), line.end(), line.begin(), ::tolower);
 		parseLine(line);
 		

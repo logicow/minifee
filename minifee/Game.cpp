@@ -8,8 +8,8 @@ Game::Game(Graphics *aGraphics, Gamepad *aGamepad)
 
 void Game::update()
 {
-	static double px = 100;
-	static double py = 100;
+	static double px = 2;
+	static double py = 2;
 
 	if (gamepad->pressed[gamepadButton::LEFT]) {
 		px -= 100 * graphics->frameTime;
@@ -30,7 +30,7 @@ void Game::update()
 	if (f >= 320.0) {
 		f = 0;
 	}
-	for (int i = 1; i < 40; i++) {
+	for (int i = 1; i < 2; i++) {
 		graphics->spritePtr[i].pos = DirectX::XMFLOAT2((float)f + i*0.01f, i*0.01f);
 		graphics->spritePtr[i].sprite_color = 1;
 		graphics->spritePtr[i].sprite_flags = 0;
@@ -42,7 +42,7 @@ void Game::update()
 	graphics->spritePtr[0].sprite_flags = 0;
 	graphics->spritePtr[0].sprite_index = 0;
 
-	graphics->spriteCount = 40;
+	graphics->spriteCount = 2;
 
 	
 }
@@ -53,16 +53,13 @@ int Game::run()
 	graphics->setWindow(320, 200, "Minifee");
 	
 	graphics->startLoad();
-	graphics->loadSprite("small", false);
+	graphics->loadSpriteRect("small", 0, 0, 16, 16, false);
 	graphics->loadSprite("title", false);
 	graphics->endLoad();
 
-	winSynth synth;
-	synth.start();
-
 	graphics->startUpdatePalette();
 	for (int i = 0; i < 256; i++) {
-		graphics->palettePtr[i] = 0xFFFF0000 | ((i * 0xFF) & 0xFF);
+		graphics->palettePtr[i] = 0xFF000000 | (i * 0x123456);
 	}
 
 	graphics->startUpdateSpriteLookup();
