@@ -1,9 +1,10 @@
 #include "Game.h"
 
-Game::Game(Graphics *aGraphics, Gamepad *aGamepad)
+Game::Game(Graphics *aGraphics, Gamepad *aGamepad, winSynth *aSynth)
 {
 	graphics = aGraphics;
 	gamepad = aGamepad;
+	synth = aSynth;
 }
 
 void Game::update()
@@ -69,6 +70,9 @@ int Game::run()
 	for (int i = 0; i < 256; i++) {
 		graphics->spriteLookupPtr[256 + i] = i == 0 ? 0 : 255 - i;
 	}
+
+	synth->loadXM("coolio");
+	synth->playXM(0);
 
 	int frameC = 0;
 	while (!graphics->shouldExit())

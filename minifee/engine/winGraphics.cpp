@@ -18,6 +18,44 @@ winGraphics::winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLi
 	QueryPerformanceFrequency((LARGE_INTEGER*)&intervalFrequency);
 }
 
+winGraphics::~winGraphics()
+{
+	backTex->Release();
+	indexTex->Release();
+	tilesTex->Release();
+	tilemapTex->Release();
+	spritesTex->Release();
+	paletteTex->Release();
+	backRTV->Release();
+	indexRTV->Release();
+	indexRV->Release();
+	paletteRV->Release();
+	tilesRV->Release();
+	tilemapRV->Release();
+	spritesRV->Release();
+	spriteLookupRV->Release();
+	depthStencilStateOff->Release();
+	quadsIndexBuffer->Release();
+	quadsVertexBuffer->Release();
+	spritesVertexBuffer->Release();
+	spritesIndexBuffer->Release();
+	spritesInfoBuffer->Release();
+	spritesConstantBuffer->Release();
+	spritesVertexShader->Release();
+	spritesInputLayout->Release();
+	spritesPixelShader->Release();
+	tilesVertexShader->Release();
+	tilesInputLayout->Release();
+	tilesPixelShader->Release();
+	indexedVertexShader->Release();
+	indexedInputLayout->Release();
+	indexedPixelShader->Release();
+
+	swapChain->Release();
+	context->Release();
+	device->Release();
+}
+
 LRESULT WINAPI WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -122,6 +160,11 @@ void winGraphics::createDevice()
 
 	D3DCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, &reqLevel, 1,
 		D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, &level, &context));
+
+	if (!device || !swapChain) {
+		D3DCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &reqLevel, 1,
+			D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, &level, &context));
+	}
 }
 
 void winGraphics::createBackbuffer()

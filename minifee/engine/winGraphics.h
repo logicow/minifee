@@ -19,6 +19,7 @@ class winGraphics : Graphics
 {
 public:
 	winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShow, Config *config);
+	~winGraphics();
 	virtual void setWindow(int width, int height, std::string name);
 	virtual bool shouldExit();
 	virtual void swap();

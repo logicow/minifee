@@ -28,62 +28,68 @@
     <Filter Include="Source Files\Minifee\shaders">
       <UniqueIdentifier>{e6d27b70-19ec-4608-ad4a-1a873a46f3f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\chibi-xmplayer">
+      <UniqueIdentifier>{d3059bc0-30d7-4f6c-83c9-ed1c5cdbfb81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="winGraphics.cpp">
-      <Filter>Source Files\Engine\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="winMain.cpp">
-      <Filter>Source Files\Engine\windows</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files\Minifee</Filter>
     </ClCompile>
-    <ClCompile Include="picopng.cpp">
+    <ClCompile Include="engine\winGamepad.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\winGraphics.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\winGraphicsSprites.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\winSynth.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\picopng.cpp">
       <Filter>Source Files\Engine\all</Filter>
     </ClCompile>
-    <ClCompile Include="dxDescriptions.cpp">
-      <Filter>Source Files\Engine\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="winGamepad.cpp">
-      <Filter>Source Files\Engine\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="Config.cpp">
+    <ClCompile Include="engine\Config.cpp">
       <Filter>Source Files\Engine\all</Filter>
     </ClCompile>
-    <ClCompile Include="winGraphicsSprites.cpp">
+    <ClCompile Include="engine\dxDescriptions.cpp">
       <Filter>Source Files\Engine\windows</Filter>
     </ClCompile>
-    <ClCompile Include="winSynth.cpp">
-      <Filter>Source Files\Engine\windows</Filter>
+    <ClCompile Include="winMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\chibi-xmplay-master\xmplay.c">
+      <Filter>Source Files\Engine\chibi-xmplayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="winGraphics.h">
-      <Filter>Source Files\Engine\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Source Files\Engine\all</Filter>
-    </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Source Files\Minifee</Filter>
     </ClInclude>
-    <ClInclude Include="BaseMath.h">
-      <Filter>Source Files\Engine\all</Filter>
+    <ClInclude Include="engine\chibi-xmplay-master\xmplay.h">
+      <Filter>Source Files\Engine\chibi-xmplayer</Filter>
     </ClInclude>
-    <ClInclude Include="dxDescriptions.h">
+    <ClInclude Include="engine\winGamepad.h">
       <Filter>Source Files\Engine\windows</Filter>
     </ClInclude>
-    <ClInclude Include="Gamepad.h">
-      <Filter>Source Files\Engine\all</Filter>
-    </ClInclude>
-    <ClInclude Include="winGamepad.h">
+    <ClInclude Include="engine\winGraphics.h">
       <Filter>Source Files\Engine\windows</Filter>
     </ClInclude>
-    <ClInclude Include="Config.h">
+    <ClInclude Include="engine\winSynth.h">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Gamepad.h">
       <Filter>Source Files\Engine\all</Filter>
     </ClInclude>
-    <ClInclude Include="winSynth.h">
+    <ClInclude Include="engine\Graphics.h">
+      <Filter>Source Files\Engine\all</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Config.h">
+      <Filter>Source Files\Engine\all</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\dxDescriptions.h">
       <Filter>Source Files\Engine\windows</Filter>
     </ClInclude>
   </ItemGroup>

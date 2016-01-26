@@ -88,6 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>engine/chibi-xmplay-master;engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -114,6 +115,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>engine/chibi-xmplay-master;engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -148,29 +150,31 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Small|Win32'">
     <ClCompile>
       <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>engine/chibi-xmplay-master;engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="engine\chibi-xmplay-master\xmplay.c" />
+    <ClCompile Include="engine\Config.cpp" />
+    <ClCompile Include="engine\dxDescriptions.cpp" />
+    <ClCompile Include="engine\picopng.cpp" />
+    <ClCompile Include="engine\winGamepad.cpp" />
+    <ClCompile Include="engine\winGraphics.cpp" />
+    <ClCompile Include="engine\winGraphicsSprites.cpp" />
+    <ClCompile Include="engine\winSynth.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="picopng.cpp" />
-    <ClCompile Include="winGamepad.cpp" />
-    <ClCompile Include="winGraphics.cpp" />
-    <ClCompile Include="dxDescriptions.cpp" />
-    <ClCompile Include="winGraphicsSprites.cpp" />
     <ClCompile Include="winMain.cpp" />
-    <ClCompile Include="winSynth.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Config.h" />
+    <ClInclude Include="engine\chibi-xmplay-master\xmplay.h" />
+    <ClInclude Include="engine\Config.h" />
+    <ClInclude Include="engine\dxDescriptions.h" />
+    <ClInclude Include="engine\Gamepad.h" />
+    <ClInclude Include="engine\Graphics.h" />
+    <ClInclude Include="engine\winGamepad.h" />
+    <ClInclude Include="engine\winGraphics.h" />
+    <ClInclude Include="engine\winSynth.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="Gamepad.h" />
-    <ClInclude Include="Graphics.h" />
-    <ClInclude Include="BaseMath.h" />
-    <ClInclude Include="winGamepad.h" />
-    <ClInclude Include="winGraphics.h" />
-    <ClInclude Include="dxDescriptions.h" />
-    <ClInclude Include="winSynth.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\indexed_to_rgba_ps.hlsl">

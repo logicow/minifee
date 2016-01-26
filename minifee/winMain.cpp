@@ -13,7 +13,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	winGamepad gamepad;
 	winSynth synth(&config);
 	synth.start();
-	Game game((Graphics*)&graphics, (Gamepad*)&gamepad);
+	Game game((Graphics*)&graphics, (Gamepad*)&gamepad, &synth);
 
 	game.run();
 
