@@ -6,6 +6,20 @@
 #include "xmplay.h"
 #include <vector>
 
+enum synthInstrument
+{
+	SQUARE_WAVE,
+	MOD_SINE
+};
+
+struct synthNote
+{
+	int time;
+	synthInstrument instrument;
+	float frequency;
+	int duration;
+};
+
 class winSynth
 {
 public:
@@ -17,6 +31,8 @@ public:
 
 	int loadXM(std::string name);
 	void playXM(int i);
+
+	void playString(std::string sound, synthInstrument instrument);
 
 private:
 	IAudioClient *audioClient;
@@ -32,6 +48,9 @@ private:
 	std::vector<XM_Song*> xmSongs;
 	xm_s32 *xmMixBuffer;
 	float xmVolume;
+
+	std::vector<synthNote> notes;
+	float noteVolume;
 
 	void fillBuffer(float *bufferStereoInterleaved, int nbSamples);
 };

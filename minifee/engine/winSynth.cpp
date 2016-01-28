@@ -1,6 +1,7 @@
 #include "winSynth.h"
 #include "math.h"
 #include "xmplay.c"
+#include <algorithm>
 
 FILE *xmFile;
 xm_bool xmFileBigEndian;
@@ -108,6 +109,7 @@ winSynth::winSynth(Config *config)
 	xmFile = nullptr;
 	xmMixBuffer = nullptr;
 	xmVolume = 1.0f;
+	noteVolume = 1.0f;
 }
 
 void threadFunc(void *synthObj)
@@ -148,9 +150,6 @@ void winSynth::loop()
 
 void winSynth::fillBuffer(float *buf, int nbSamples)
 {
-	static int ctr = 0;
-	static float fbk = 0;
-	
 	for (int i = 0; i < nbSamples; i++)
 	{
 		xmMixBuffer[i * 2 + 0] = 0;
@@ -159,20 +158,79 @@ void winSynth::fillBuffer(float *buf, int nbSamples)
 
 	xm_software_mix_to_buffer(xmMixBuffer, nbSamples);
 
-	for (int i = 0; i < nbSamples; i++)
-	{
-		//float bla = ctr + fbk * 100;
-		//float out = sin(sin(bla * 0.05f) * 3.0f + bla * 0.01f) * sin(bla * 0.0005f + 600.3f * sin(bla * 0.00003f)) * 0.1f;
-		//float out = sin(bla * 0.05f) * 0.1f;
-		float out = sin(ctr * 0.05f) * 0.0f;
-
-		buf[i * 2 + 0] = out + (float)xmMixBuffer[i * 2 + 0] / UINT_MAX;
-		buf[i * 2 + 1] = out + (float)xmMixBuffer[i * 2 + 1] / UINT_MAX;
-		fbk = out;
-		
-		ctr += 1;
+	for (int i = 0; i < nbSamples; i++) {
+		buf[i * 2 + 0] = (float)xmMixBuffer[i * 2 + 0] * xmVolume / UINT_MAX;
+		buf[i * 2 + 1] = (float)xmMixBuffer[i * 2 + 1] * xmVolume / UINT_MAX;
 	}
 
+	for (int n = 0; n < notes.size(); n++) {
+		synthNote &note = notes[n];
+
+		int soundEnd = note.duration - note.time;
+		if (soundEnd > nbSamples) {
+			soundEnd = nbSamples;
+		}
+		if (soundEnd < 0) {
+			soundEnd = 0;
+		}
+
+		int soundStart = -note.time;
+		if (soundStart < 0) {
+			soundStart = 0;
+		}
+
+		int t = ((note.time + soundStart) * (int)note.frequency);
+
+		if (note.instrument == synthInstrument::SQUARE_WAVE) {
+			t %= waveFormat->nSamplesPerSec;
+			for (int i = soundStart; i < soundEnd; i++) {
+				float f = (float)t / waveFormat->nSamplesPerSec;
+				buf[i * 2 + 0] += noteVolume * (f > 0.5f ? 1.0f : -1.0f);
+				buf[i * 2 + 1] += noteVolume * (f > 0.5f ? 1.0f : -1.0f);
+				t = (t + (int)note.frequency) % waveFormat->nSamplesPerSec;
+			}
+		}
+
+		else if (note.instrument == synthInstrument::MOD_SINE) {
+			float env = (float)(note.time + soundStart) * 18.0f / waveFormat->nSamplesPerSec;
+			float envAdd = (float) 18.0f / waveFormat->nSamplesPerSec;
+			for (int i = soundStart; i < soundEnd; i++) {
+				float f = (float)t / waveFormat->nSamplesPerSec;
+				if (env > 1.0f) {
+					env = 1.0f;
+				}
+				buf[i * 2 + 0] += env * noteVolume * sin(f * 2.0f * 3.141569 + 2.25f * sin(f * .25f * 2.0f * 3.141569));
+				buf[i * 2 + 1] += env * noteVolume * sin(f * 2.0f * 3.141569 + 2.25f * sin(f * .25f * 2.0f * 3.141569));
+				t = (t + (int)note.frequency);
+				env += envAdd;
+			}
+			float env1 = 1.0f - (float)(note.time + soundEnd - note.duration) * 32.0f / waveFormat->nSamplesPerSec;
+			float env2 = 0.5f - (float)(note.time + soundEnd - note.duration) * 2.0f / waveFormat->nSamplesPerSec;
+			float envAdd1 = -32.0f / waveFormat->nSamplesPerSec;
+			float envAdd2 = -1.0f / waveFormat->nSamplesPerSec;
+
+			for (int i = soundEnd; i < nbSamples; i++) {
+				float f = (float)t / waveFormat->nSamplesPerSec;
+				float env = env1 > env2 ? env1 : env2;
+				if (env < 0.0f) {
+					env = 0.0f;
+				}
+				buf[i * 2 + 0] += env * noteVolume * sin(f * 2.0f * 3.141569 + 2.25f * sin(f * .25f * 2.0f * 3.141569));
+				buf[i * 2 + 1] += env * noteVolume * sin(f * 2.0f * 3.141569 + 2.25f * sin(f * .25f * 2.0f * 3.141569));
+				t = (t + (int)note.frequency);
+				env1 += envAdd1;
+				env2 += envAdd2;
+			}
+		}
+
+		note.time += nbSamples;
+
+		if (note.time >= note.duration + 1.0f * waveFormat->nSamplesPerSec) {
+			notes[n] = notes[notes.size() - 1];
+			notes.pop_back();
+			n -= 1;
+		}
+	}
 }
 
 
@@ -259,4 +317,132 @@ void winSynth::playXM(int i)
 {
 	xm_player_set_song(xmSongs[i]);
 	xm_player_play();
+}
+
+void winSynth::playString(std::string string, synthInstrument instrument)
+{
+	std::transform(string.begin(), string.end(), string.begin(), ::tolower);
+
+	int octave = 3;
+	int note = -1;
+	float duration = 1.0f / 32.0f;
+	float start = 0.0f;
+
+	for (int i = 0; i < string.size(); i++)
+	{
+		bool play = false;
+		char c = string[i];
+		if (c == 'a') {
+			note = 0;
+			play = true;
+		}
+		if (c == 'b') {
+			note = 2;
+			play = true;
+		}
+		if (c == 'c') {
+			note = -9;
+			play = true;
+		}
+		if (c == 'd') {
+			note = -7;
+			play = true;
+		}
+		if (c == 'e') {
+			note = -5;
+			play = true;
+		}
+		if (c == 'f') {
+			note = -4;
+			play = true;
+		}
+		if (c == 'g') {
+			note = -2;
+			play = true;
+		}
+		if (c == '0') {
+			octave = 0;
+		}
+		if (c == '1') {
+			octave = 1;
+		}
+		if (c == '2') {
+			octave = 2;
+		}
+		if (c == '3') {
+			octave = 3;
+		}
+		if (c == '4') {
+			octave = 4;
+		}
+		if (c == '5') {
+			octave = 5;
+		}
+		if (c == '6') {
+			octave = 6;
+		}
+		if (c == '-') {
+			octave = octave > 0 ? octave - 1 : 0;
+		}
+		if (c == '+') {
+			octave = octave < 6 ? octave + 1 : 6;
+		}
+		if (c == 'x') {
+			note = -1;
+			play = true;
+		}
+		if (c == 'z') {
+			duration = 1.0f / 64.0f;
+		}
+		if (c == 't') {
+			duration = 1.0f / 32.0f;
+		}
+		if (c == 's') {
+			duration = 1.0f / 16.0f;
+		}
+		if (c == 'i') {
+			duration = 1.0f / 8.0f;
+		}
+		if (c == 'q') {
+			duration = 1.0f / 4.0f;
+		}
+		if (c == 'h') {
+			duration = 1.0f / 2.0f;
+		}
+		if (c == 'w') {
+			duration = 1.0f;
+		}
+		if (c == '.') {
+			duration *= 1.5f;
+		}
+		if (c == '!') {
+			duration /= 3.0f;
+		}
+
+		if (play && note == -1) {
+			play = false;
+			start += duration;
+		}
+
+		if (play && (i + 1 < string.length())) {
+			char c = string[i + 1];
+			if (c == '#') {
+				note += 1;
+			}
+			if (c == '$') {
+				note -= 1;
+			}
+		}
+
+		if (play) {
+			synthNote newNote;
+			newNote.time = (int)(-start * 1.2f * waveFormat->nSamplesPerSec);
+			newNote.duration = (int)(duration * 1.2f * waveFormat->nSamplesPerSec);
+			newNote.instrument = instrument;
+			newNote.frequency = (float)(440.0 * pow(2, (double)note/12.0 + octave - 3.0));
+			notes.push_back(newNote);
+
+			start += duration;
+		}
+	}
 }

@@ -25,6 +25,20 @@ void Game::update()
 		py += 100 * graphics->frameTime;
 	}
 
+	static bool previousPressed = false;
+	if (gamepad->pressed[gamepadButton::A] && !previousPressed) {
+		synth->playString("ic1c+ca#+c1c+cx+d#1c+ca#+c1c+cx+c1c+ca#+c1c+cx+d#1c+c+fc1c+cx", synthInstrument::MOD_SINE);
+		//synth->playString("2c+c+c2d#+d#+d#2g+g+g3cd#g", synthInstrument::SQUARE_WAVE);
+	}
+	previousPressed = gamepad->pressed[gamepadButton::A];
+
+	static bool previousPressed2 = false;
+	if (gamepad->pressed[gamepadButton::B] && !previousPressed2) {
+		//synth->playString("ic1c+ca#+c1c+cx+d#1c+ca#+c1c+cx+c1c+ca#+c1c+cx+d#1c+c+fc1c+cx", synthInstrument::SQUARE_WAVE);
+		synth->playString("2c+c+c2d#+d#+d#2g+g+g3cd#g", synthInstrument::SQUARE_WAVE);
+	}
+	previousPressed2 = gamepad->pressed[gamepadButton::B];
+
 	graphics->startUpdateSprites();
 	static double f = 0;
 	f += 200.0 * graphics->frameTime;
@@ -81,6 +95,7 @@ int Game::run()
 		update();
 		graphics->swap();
 		graphics->frameTime;
+		Sleep(0);
 	}
 	return 0;
 }
