@@ -111,12 +111,12 @@ D3D11_RENDER_TARGET_VIEW_DESC getIndexRTVDesc()
 	return renderTargetViewDesc;
 }
 
-D3D11_TEXTURE2D_DESC getTilesTexDesc()
+D3D11_TEXTURE2D_DESC getTilesTexDesc(int width, int height)
 {
 	D3D11_TEXTURE2D_DESC texDesc;
 	ZeroMemory(&texDesc, sizeof(texDesc));
-	texDesc.Width = 256;
-	texDesc.Height = 256;
+	texDesc.Width = width;
+	texDesc.Height = height;
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
 	texDesc.Format = DXGI_FORMAT_R8_UINT;
@@ -129,12 +129,12 @@ D3D11_TEXTURE2D_DESC getTilesTexDesc()
 	return texDesc;
 }
 
-D3D11_TEXTURE2D_DESC getTilemapTexDesc()
+D3D11_TEXTURE2D_DESC getTilemapTexDesc(int width, int height)
 {
 	D3D11_TEXTURE2D_DESC texDesc;
 	ZeroMemory(&texDesc, sizeof(texDesc));
-	texDesc.Width = 256;
-	texDesc.Height = 256;
+	texDesc.Width = width;
+	texDesc.Height = height;
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
 	texDesc.Format = DXGI_FORMAT_R16_UINT;
@@ -301,7 +301,7 @@ D3D11_BUFFER_DESC getSpritesVertexBufferDesc()
 {
 	D3D11_BUFFER_DESC bufferDescription;
 	ZeroMemory(&bufferDescription, sizeof(bufferDescription));
-	bufferDescription.ByteWidth = MAX_SPRITES * sizeof(SpriteVertex);
+	bufferDescription.ByteWidth = MAX_SPRITES * sizeof(DirectX::XMFLOAT2) * 4;
 	bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
 	bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDescription.CPUAccessFlags = 0;
@@ -321,11 +321,35 @@ D3D11_BUFFER_DESC getSpritesIndexBufferDesc()
 	return bufferDescription;
 }
 
+D3D11_BUFFER_DESC getTilemapVertexBufferDesc()
+{
+	D3D11_BUFFER_DESC bufferDescription;
+	ZeroMemory(&bufferDescription, sizeof(bufferDescription));
+	bufferDescription.ByteWidth = MAX_SPRITES * sizeof(DirectX::XMFLOAT2) * 4;
+	bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+	bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDescription.CPUAccessFlags = 0;
+	bufferDescription.MiscFlags = 0;
+	return bufferDescription;
+}
+
+D3D11_BUFFER_DESC getTilemapIndexBufferDesc()
+{
+	D3D11_BUFFER_DESC bufferDescription;
+	ZeroMemory(&bufferDescription, sizeof(bufferDescription));
+	bufferDescription.ByteWidth = MAX_SPRITES * 6 * 2;
+	bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+	bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bufferDescription.CPUAccessFlags = 0;
+	bufferDescription.MiscFlags = 0;
+	return bufferDescription;
+}
+
 D3D11_BUFFER_DESC getSpritesAtlasBufferDesc()
 {
 	D3D11_BUFFER_DESC bufferDescription;
 	ZeroMemory(&bufferDescription, sizeof(bufferDescription));
-	bufferDescription.ByteWidth = 1024 * sizeof(SpriteConstant);//spriteIndexTable.size() * sizeof(SpriteConstant);
+	bufferDescription.ByteWidth = 1024 * sizeof(SpriteConstant);
 	bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
 	bufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bufferDescription.CPUAccessFlags = 0;
@@ -345,11 +369,44 @@ D3D11_BUFFER_DESC getSpritesInfoBufferDesc()
 	return bufferDescription;
 }
 
+D3D11_BUFFER_DESC getTilemapAtlasBufferDesc()
+{
+	D3D11_BUFFER_DESC bufferDescription;
+	ZeroMemory(&bufferDescription, sizeof(bufferDescription));
+	bufferDescription.ByteWidth = 1024 * sizeof(TilemapConstant);
+	bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+	bufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDescription.CPUAccessFlags = 0;
+	bufferDescription.MiscFlags = 0;
+	return bufferDescription;
+}
+
+D3D11_BUFFER_DESC getTilemapInfoBufferDesc()
+{
+	D3D11_BUFFER_DESC bufferDescription;
+	ZeroMemory(&bufferDescription, sizeof(bufferDescription));
+	bufferDescription.ByteWidth = MAX_SPRITES * sizeof(TilemapVertex);
+	bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
+	bufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bufferDescription.MiscFlags = 0;
+	return bufferDescription;
+}
+
 D3D11_SUBRESOURCE_DATA getDataDesc(std::vector<unsigned char> &refData, int textureWidth)
 {
 	D3D11_SUBRESOURCE_DATA bufferDataDesc;
 	bufferDataDesc.pSysMem = (void*)&refData[0];
 	bufferDataDesc.SysMemPitch = textureWidth == -1 ? refData.size() : textureWidth;
+	bufferDataDesc.SysMemSlicePitch = 0;
+	return bufferDataDesc;
+}
+
+D3D11_SUBRESOURCE_DATA getDataDesc16(std::vector<uint16_t> &refData, int textureWidth)
+{
+	D3D11_SUBRESOURCE_DATA bufferDataDesc;
+	bufferDataDesc.pSysMem = (void*)&refData[0];
+	bufferDataDesc.SysMemPitch = textureWidth == -1 ? refData.size() : textureWidth * 2;
 	bufferDataDesc.SysMemSlicePitch = 0;
 	return bufferDataDesc;
 }
@@ -391,6 +448,32 @@ void getSpritesVertexData(std::vector<unsigned char> &buffer)
 }
 
 void getSpritesIndexData(std::vector<unsigned char> &buffer)
+{
+	buffer.resize((size_t)MAX_SPRITES * sizeof(uint16_t) * 6);
+	void* bufferDataPtr = (void*)&buffer[0];
+	for (int i = 0; i < MAX_SPRITES; i++) {
+		((uint16_t*)bufferDataPtr)[i * 6 + 0] = i * 4 + 0;
+		((uint16_t*)bufferDataPtr)[i * 6 + 1] = i * 4 + 1;
+		((uint16_t*)bufferDataPtr)[i * 6 + 2] = i * 4 + 2;
+		((uint16_t*)bufferDataPtr)[i * 6 + 3] = i * 4 + 1;
+		((uint16_t*)bufferDataPtr)[i * 6 + 4] = i * 4 + 3;
+		((uint16_t*)bufferDataPtr)[i * 6 + 5] = i * 4 + 2;
+	}
+}
+
+void getTilemapVertexData(std::vector<unsigned char> &buffer)
+{
+	buffer.resize((size_t)MAX_SPRITES * sizeof(DirectX::XMFLOAT2) * 4);
+	void* bufferDataPtr = (void*)&buffer[0];
+	for (int i = 0; i < MAX_SPRITES; i++) {
+		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 0] = DirectX::XMFLOAT2(0.0f, 0.0f);
+		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 1] = DirectX::XMFLOAT2(1.0f, 0.0f);
+		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 2] = DirectX::XMFLOAT2(0.0f, 1.0f);
+		((DirectX::XMFLOAT2*)bufferDataPtr)[i * 4 + 3] = DirectX::XMFLOAT2(1.0f, 1.0f);
+	}
+}
+
+void getTilemapIndexData(std::vector<unsigned char> &buffer)
 {
 	buffer.resize((size_t)MAX_SPRITES * sizeof(uint16_t) * 6);
 	void* bufferDataPtr = (void*)&buffer[0];

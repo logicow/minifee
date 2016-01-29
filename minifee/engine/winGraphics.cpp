@@ -14,6 +14,8 @@ winGraphics::winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLi
 	palettePtr = nullptr;
 	spriteLookupPtr = nullptr;
 	
+	tilemapCount = 0;
+
 	frameTime = 0;
 	QueryPerformanceFrequency((LARGE_INTEGER*)&intervalFrequency);
 }
@@ -187,18 +189,6 @@ void winGraphics::createPalette()
 	D3DCALL(device->CreateShaderResourceView(paletteTex, &getPaletteRVDesc(), &paletteRV));
 }
 
-void winGraphics::createTilemap()
-{
-	D3DCALL(device->CreateTexture2D(&getTilemapTexDesc(), NULL, &tilemapTex));
-	D3DCALL(device->CreateShaderResourceView(tilemapTex, &getTilemapRVDesc(), &tilemapRV));
-}
-
-void winGraphics::createTiles()
-{
-	D3DCALL(device->CreateTexture2D(&getTilesTexDesc(), NULL, &tilesTex));
-	D3DCALL(device->CreateShaderResourceView(tilesTex, &getTilesRVDesc(), &tilesRV));
-}
-
 void winGraphics::loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DESC* input_element_description, int num_elements, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout)
 {
 	std::string path = "../data/shaders/" + filename + ".cso";
@@ -224,8 +214,7 @@ void winGraphics::loadShaders()
 	loadVertexShader("indexed_to_rgba_vs", indexedVertexDesc, 1, &indexedVertexShader, &indexedInputLayout);
 	loadPixelShader("indexed_to_rgba_ps", &indexedPixelShader);
 
-	loadVertexShader("tilemaps_vs", tilemapsVertexDesc, 4, &tilesVertexShader, &tilesInputLayout);
-	loadPixelShader("tilemaps_ps", &tilesPixelShader);
+	loadShadersMaps();
 }
 
 void winGraphics::loadBuffers()
@@ -261,8 +250,6 @@ void winGraphics::setWindow(int width, int height, std::string name)
 	createDevice();
 	createBackbuffer();
 	createIndexBuffer();
-	createTilemap();
-	createTiles();
 	loadShaders();
 	createViewport();
 	createPalette();
@@ -287,11 +274,6 @@ void winGraphics::mapLookup()
 	context->Map(spriteLookupTex, 0, D3D11_MAP::D3D11_MAP_WRITE_DISCARD, 0, &mapped_lookup);
 
 	spriteLookupPtr = (uint8_t*)mapped_lookup.pData;
-}
-
-void winGraphics::callTiles()
-{
-
 }
 
 void winGraphics::callIndexed()
@@ -327,8 +309,8 @@ void winGraphics::swap()
 	const float c1[1] = { 128.0f };
 	context->ClearRenderTargetView(indexRTV, c1);
 
+	callTiles();
 	callSprites();
-	//callTiles();
 	callIndexed();
 
 	D3DCALL(swapChain->Present(0, 0));
@@ -348,6 +330,7 @@ void winGraphics::startLoad()
 void winGraphics::endLoad()
 {
 	endLoadSprites();
+	endLoadMaps();
 	loadBuffers();
 	QueryPerformanceCounter((LARGE_INTEGER*)&intervalCounter);
 }

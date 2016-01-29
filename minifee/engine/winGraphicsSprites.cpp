@@ -16,7 +16,6 @@ void winGraphics::mapSprites()
 	spriteCount = 0;
 }
 
-
 void winGraphics::callSprites()
 {
 	if (spritePtr) {

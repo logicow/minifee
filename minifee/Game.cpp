@@ -70,6 +70,9 @@ int Game::run()
 	graphics->startLoad();
 	graphics->loadSpriteRect("small", 0, 0, 16, 16, false);
 	graphics->loadSprite("title", false);
+
+	//graphics->loadMap("sewers");
+
 	graphics->endLoad();
 
 	graphics->startUpdatePalette();

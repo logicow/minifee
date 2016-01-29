@@ -28,9 +28,12 @@ public:
 	virtual int loadSprite(std::string name, bool centered);
 	virtual int loadSpriteRect(std::string name, int x, int y, int width, int height, bool centered);
 
+	virtual int loadMap(std::string name);
+
 	virtual void startUpdateSprites();
 	virtual void startUpdateSpriteLookup();
 	virtual void startUpdatePalette();
+	virtual void startUpdateTilemaps();
 private:
 	HINSTANCE hInstance;
 	HINSTANCE hPrevInst;
@@ -75,6 +78,11 @@ private:
 	ID3D11Buffer* spritesInfoBuffer;
 	ID3D11Buffer* spritesConstantBuffer;
 
+	ID3D11Buffer* tilemapsVertexBuffer;
+	ID3D11Buffer* tilemapsIndexBuffer;
+	ID3D11Buffer* tilemapsInfoBuffer;
+	ID3D11Buffer* tilemapsConstantBuffer;
+
 	ID3D11VertexShader* spritesVertexShader;
 	ID3D11InputLayout* spritesInputLayout;
 	ID3D11PixelShader* spritesPixelShader;
@@ -98,13 +106,12 @@ private:
 	void createIndexBuffer();
 	void createViewport();
 	void createPalette();
-	void createTilemap();
-	void createTiles();
 	
 	void loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DESC* input_element_description, int num_elements, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout);
 	void loadPixelShader(std::string filename, ID3D11PixelShader** pixel_shader);
 	void loadShaders();
 	void loadShadersSprites();
+	void loadShadersMaps();
 	void loadBuffers();
 	void callSprites();
 	void callTiles();
@@ -113,7 +120,10 @@ private:
 	void mapSprites();
 	void mapPalette();
 	void mapLookup();
+	void mapTilemaps();
 	void endLoadSprites();
+
+	void endLoadMaps();
 
 	std::vector<std::string> spritesToLoad;
 	std::vector<bool> spritesToLoadCentered;
@@ -121,4 +131,7 @@ private:
 	std::vector<int> spritesToLoadY;
 	std::vector<int> spritesToLoadWidth;
 	std::vector<int> spritesToLoadHeight;
+
+	std::vector<std::string> mapsToLoad;
+	int tilemapCount;
 };

@@ -63,6 +63,9 @@
     <ClCompile Include="engine\chibi-xmplay-master\xmplay.c">
       <Filter>Source Files\Engine\chibi-xmplayer</Filter>
     </ClCompile>
+    <ClCompile Include="engine\winGraphicsMaps.cpp">
+      <Filter>Source Files\Engine\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
