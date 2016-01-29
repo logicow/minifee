@@ -4,7 +4,7 @@
 
 void winGraphics::loadShadersMaps()
 {
-	loadVertexShader("tilemaps_vs", tilemapsVertexDesc, 4, &tilesVertexShader, &tilesInputLayout);
+	loadVertexShader("tilemaps_vs", tilemapsVertexDesc, 1, &tilesVertexShader, &tilesInputLayout);
 	loadPixelShader("tilemaps_ps", &tilesPixelShader);
 }
 
@@ -12,7 +12,7 @@ int winGraphics::loadMap(std::string name)
 {
 	mapsToLoad.push_back(name);
 
-	int initialCount = tilemapCount;
+	int initialCount = tilemapLoadCount;
 
 	std::string path = "../data/maps/" + name + ".tmx";
 
@@ -30,7 +30,7 @@ int winGraphics::loadMap(std::string name)
 		layerNode = layerNode->next_sibling("layer");
 	}
 
-	tilemapCount += layers;
+	tilemapLoadCount += layers;
 
 	return initialCount;
 }
@@ -106,9 +106,11 @@ void winGraphics::endLoadMaps()
 
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
-					int tile = atoi(tileNode->first_attribute("gid")->value());
-					uint16_t utile = tile <= 0 ? 0 : tile + tileStart;
+					int tile = tileNode ? atoi(tileNode->first_attribute("gid")->value()) : 0;
+					uint16_t utile = tile <= 0 ? 0 : tile + tileStart - 1;
 					layerTiles.push_back(utile);
+
+					tileNode = tileNode->next_sibling("tile");
 				}
 			}
 
@@ -308,7 +310,7 @@ void winGraphics::callTiles()
 {
 	if (tilemapPtr) {
 		context->Unmap(tilemapsInfoBuffer, 0);
-		spritePtr = nullptr;
+		tilemapPtr = nullptr;
 	}
 
 	UINT stride = sizeof(DirectX::XMFLOAT2);

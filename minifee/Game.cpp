@@ -59,7 +59,11 @@ void Game::update()
 
 	graphics->spriteCount = 2;
 
-	
+	graphics->startUpdateTilemaps();
+	graphics->tilemapPtr[0].pos = DirectX::XMFLOAT2((float)px * -2.0f, (float)py * -2.0f);
+	graphics->tilemapPtr[0].tilemap_index = 0;
+	graphics->tilemapCount = 1;
+
 }
 
 #include "winSynth.h"
@@ -71,7 +75,7 @@ int Game::run()
 	graphics->loadSpriteRect("small", 0, 0, 16, 16, false);
 	graphics->loadSprite("title", false);
 
-	//graphics->loadMap("sewers");
+	graphics->loadMap("sewers");
 
 	graphics->endLoad();
 

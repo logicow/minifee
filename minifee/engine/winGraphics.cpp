@@ -14,7 +14,7 @@ winGraphics::winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLi
 	palettePtr = nullptr;
 	spriteLookupPtr = nullptr;
 	
-	tilemapCount = 0;
+	tilemapLoadCount = 0;
 
 	frameTime = 0;
 	QueryPerformanceFrequency((LARGE_INTEGER*)&intervalFrequency);

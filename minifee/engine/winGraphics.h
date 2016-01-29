@@ -133,5 +133,5 @@ private:
 	std::vector<int> spritesToLoadHeight;
 
 	std::vector<std::string> mapsToLoad;
-	int tilemapCount;
+	int tilemapLoadCount;
 };
