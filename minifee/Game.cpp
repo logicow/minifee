@@ -59,11 +59,22 @@ void Game::update()
 
 	graphics->spriteCount = 2;
 
-	graphics->startUpdateTilemaps();
-	graphics->tilemapPtr[0].pos = DirectX::XMFLOAT2((float)px * -2.0f, (float)py * -2.0f);
-	graphics->tilemapPtr[0].tilemap_index = 0;
-	graphics->tilemapCount = 1;
+	graphics->startUpdateTilemapDraw();
+	graphics->tilemapDrawPtr[0].pos = DirectX::XMFLOAT2((float)px * -2.0f, (float)py * -2.0f);
+	graphics->tilemapDrawPtr[0].tilemap_index = 0;
+	graphics->tilemapDrawCount = 1;
 
+	int width, height;
+	graphics->startUpdateTilemapTiles(0, width, height);
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			if ((x + y) & 1) {
+				graphics->tilemapTilePtr[y * graphics->tilemapTileLineOffset + x] = 0;
+			}
+		}
+	}
+	
+	
 }
 
 #include "winSynth.h"

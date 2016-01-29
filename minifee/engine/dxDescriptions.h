@@ -19,6 +19,7 @@ D3D11_TEXTURE2D_DESC getIndexTexDesc(int width, int height);
 D3D11_RENDER_TARGET_VIEW_DESC getIndexRTVDesc();
 D3D11_TEXTURE2D_DESC getTilesTexDesc(int width, int height);
 D3D11_TEXTURE2D_DESC getTilemapTexDesc(int width, int height);
+D3D11_TEXTURE2D_DESC getCopyTexDesc(int width, int height);
 D3D11_TEXTURE1D_DESC getPaletteTexDesc();
 D3D11_TEXTURE2D_DESC getSpritesTexDesc(int height);
 D3D11_TEXTURE2D_DESC getSpriteLookupTexDesc();

@@ -46,8 +46,6 @@ void winGraphics::endLoadMaps()
 	int tileWidth = 1;
 	int tileHeight = 1;
 
-	std::vector<int> tilemapWidth;
-	std::vector<int> tilemapHeight;
 	std::vector<std::vector<uint16_t>> tilemapTiles;
 	std::vector<int> tilemapIndexTable;
 
@@ -139,13 +137,11 @@ void winGraphics::endLoadMaps()
 		}
 	}
 
-	std::vector<int> atlasXTable;
-	std::vector<int> atlasYTable;
 	std::vector<bool> atlasPlacedTable;
 
 	for (int i = 0; i < (int)tilemapIndexTable.size(); i++) {
-		atlasXTable.push_back(0);
-		atlasYTable.push_back(0);
+		tilemapAtlasXTable.push_back(0);
+		tilemapAtlasYTable.push_back(0);
 		atlasPlacedTable.push_back(false);
 	}
 
@@ -180,8 +176,8 @@ void winGraphics::endLoadMaps()
 				placed += 1;
 
 				atlasPlacedTable[index] = true;
-				atlasXTable[tilemapIndexTable[index]] = fillAtX[lastFill];
-				atlasYTable[tilemapIndexTable[index]] = fillAtY[lastFill];
+				tilemapAtlasXTable[tilemapIndexTable[index]] = fillAtX[lastFill];
+				tilemapAtlasYTable[tilemapIndexTable[index]] = fillAtY[lastFill];
 
 				fillAtX.push_back(fillAtX[lastFill] + tilemapWidth[tilemapIndexTable[index]]);
 				fillAtY.push_back(fillAtY[lastFill]);
@@ -191,8 +187,8 @@ void winGraphics::endLoadMaps()
 				fillAtY[lastFill] += tilemapHeight[tilemapIndexTable[index]];
 				fillHeight[lastFill] -= tilemapWidth[tilemapIndexTable[index]];
 
-				if (realHeight < atlasYTable[tilemapIndexTable[index]] + tilemapHeight[tilemapIndexTable[index]]) {
-					realHeight = atlasYTable[tilemapIndexTable[index]] + tilemapHeight[tilemapIndexTable[index]];
+				if (realHeight < tilemapAtlasYTable[tilemapIndexTable[index]] + tilemapHeight[tilemapIndexTable[index]]) {
+					realHeight = tilemapAtlasYTable[tilemapIndexTable[index]] + tilemapHeight[tilemapIndexTable[index]];
 				}
 			}
 			index += 1;
@@ -218,7 +214,7 @@ void winGraphics::endLoadMaps()
 	for (int i = 0; i < (int)tilemapIndexTable.size(); i++) {
 		for (int y = 0; y < (int)tilemapHeight[i]; y++) {
 			for (int x = 0; x < (int)tilemapWidth[i]; x++) {
-				tilemapTexData[(atlasYTable[i] + y) * 1024 + atlasXTable[i] + x] =
+				tilemapTexData[(tilemapAtlasYTable[i] + y) * 1024 + tilemapAtlasXTable[i] + x] =
 					tilemapTiles[i][y * tilemapWidth[i] + x];
 			}
 		}
@@ -288,8 +284,8 @@ void winGraphics::endLoadMaps()
 	for (int i = 0; i < (int)tilemapIndexTable.size(); i++) {
 		((TilemapConstant*)bufferDataPtr)[i].tc_size[0] = (uint32_t)tilemapWidth[i];
 		((TilemapConstant*)bufferDataPtr)[i].tc_size[1] = (uint32_t)tilemapHeight[i];
-		((TilemapConstant*)bufferDataPtr)[i].tc_start[0] = (uint32_t)atlasXTable[i];
-		((TilemapConstant*)bufferDataPtr)[i].tc_start[1] = (uint32_t)atlasYTable[i];
+		((TilemapConstant*)bufferDataPtr)[i].tc_start[0] = (uint32_t)tilemapAtlasXTable[i];
+		((TilemapConstant*)bufferDataPtr)[i].tc_start[1] = (uint32_t)tilemapAtlasYTable[i];
 	}
 
 	D3DCALL(device->CreateBuffer(&getTilemapAtlasBufferDesc(), &getDataDesc(atlasBufferData), &tilemapsConstantBuffer));
@@ -303,14 +299,30 @@ void winGraphics::endLoadMaps()
 	getTilemapIndexData(bufferData);
 	D3DCALL(device->CreateBuffer(&getTilemapIndexBufferDesc(), &getDataDesc(bufferData), &tilemapsIndexBuffer));
 
+	D3DCALL(device->CreateTexture2D(&getCopyTexDesc(1024, realHeight), nullptr, &copyTex));
+
 	mapsToLoad.clear();
 }
 
 void winGraphics::callTiles()
 {
-	if (tilemapPtr) {
+	if (tilemapDrawPtr) {
 		context->Unmap(tilemapsInfoBuffer, 0);
-		tilemapPtr = nullptr;
+		tilemapDrawPtr = nullptr;
+	}
+
+	if (tilemapTilePtr) {
+		context->Unmap(copyTex, 0);
+		D3D11_BOX region;
+		region.back = 1;
+		region.front = 0;
+		region.left = tilemapAtlasXTable[mappedTilemap];
+		region.right = tilemapAtlasXTable[mappedTilemap] + tilemapWidth[mappedTilemap];
+		region.top = tilemapAtlasYTable[mappedTilemap];
+		region.bottom = tilemapAtlasYTable[mappedTilemap] + tilemapHeight[mappedTilemap];
+		context->CopySubresourceRegion(tilemapTex, 0, region.left, region.top, 0, copyTex, 0, &region);
+
+		tilemapDrawPtr = nullptr;
 	}
 
 	UINT stride = sizeof(DirectX::XMFLOAT2);
@@ -330,7 +342,7 @@ void winGraphics::callTiles()
 	buffs[1] = tilemapsInfoBuffer;
 	context->VSSetConstantBuffers(0, 2, buffs);
 
-	context->DrawIndexed(tilemapCount * 6, 0, 0);
+	context->DrawIndexed(tilemapDrawCount * 6, 0, 0);
 }
 
 void winGraphics::mapTilemaps()
@@ -338,14 +350,54 @@ void winGraphics::mapTilemaps()
 	D3D11_MAPPED_SUBRESOURCE mappedTilemapsBuffer;
 	ZeroMemory(&mappedTilemapsBuffer, sizeof(mappedTilemapsBuffer));
 	D3DCALL(context->Map(tilemapsInfoBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedTilemapsBuffer));
-	tilemapPtr = (TilemapVertex*)mappedTilemapsBuffer.pData;
-	tilemapCount = 0;
+	tilemapDrawPtr = (TilemapVertex*)mappedTilemapsBuffer.pData;
+	tilemapDrawCount = 0;
 }
 
-void winGraphics::startUpdateTilemaps()
+void winGraphics::startUpdateTilemapDraw()
 {
-	if (tilemapPtr) {
+	if (tilemapDrawPtr) {
 		return;
 	}
 	mapTilemaps();
+}
+
+void winGraphics::mapTilemapsTex(int x, int y, int w, int h)
+{
+	D3D11_BOX region;
+	region.back = 1;
+	region.front = 0;
+	region.left = x;
+	region.right = x + w;
+	region.top = y;
+	region.bottom = y + h;
+	context->CopySubresourceRegion(copyTex, 0, x, y, 0, tilemapTex, 0, &region);
+
+	D3D11_MAPPED_SUBRESOURCE mappedTilemapTexBuffer;
+	ZeroMemory(&mappedTilemapTexBuffer, sizeof(mappedTilemapTexBuffer));
+	D3DCALL(context->Map(copyTex, 0, D3D11_MAP_READ_WRITE, 0, &mappedTilemapTexBuffer));
+	tilemapTilePtr = (uint16_t*)mappedTilemapTexBuffer.pData;
+}
+
+void winGraphics::startUpdateTilemapTiles(int tilemap, int& width, int& height)
+{
+	width = tilemapWidth[tilemap];
+	height = tilemapHeight[tilemap];
+
+	if (tilemapTilePtr) {
+		context->Unmap(copyTex, 0);
+		D3D11_BOX region;
+		region.back = 1;
+		region.front = 0;
+		region.left = tilemapAtlasXTable[mappedTilemap];
+		region.right = tilemapAtlasXTable[mappedTilemap] + tilemapWidth[mappedTilemap];
+		region.top = tilemapAtlasYTable[mappedTilemap];
+		region.bottom = tilemapAtlasYTable[mappedTilemap] + tilemapHeight[mappedTilemap];
+		context->CopySubresourceRegion(tilemapTex, 0, region.left, region.top, 0, copyTex, 0, &region);
+
+		tilemapDrawPtr = nullptr;
+	}
+	mapTilemapsTex(tilemapAtlasXTable[tilemap], tilemapAtlasYTable[tilemap], width, height);
+	mappedTilemap = tilemap;
+	tilemapTileLineOffset = 1024;
 }

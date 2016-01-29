@@ -147,6 +147,24 @@ D3D11_TEXTURE2D_DESC getTilemapTexDesc(int width, int height)
 	return texDesc;
 }
 
+D3D11_TEXTURE2D_DESC getCopyTexDesc(int width, int height)
+{
+	D3D11_TEXTURE2D_DESC texDesc;
+	ZeroMemory(&texDesc, sizeof(texDesc));
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R16_UINT;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_STAGING;
+	texDesc.BindFlags = 0;
+	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+	texDesc.MiscFlags = 0;
+	return texDesc;
+}
+
 D3D11_TEXTURE1D_DESC getPaletteTexDesc()
 {
 	D3D11_TEXTURE1D_DESC paletteTexDesc;

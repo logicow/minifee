@@ -42,8 +42,10 @@ public:
 	int spriteCount;
 	uint8_t *spriteLookupPtr;
 	double frameTime;
-	TilemapVertex *tilemapPtr;
-	int tilemapCount;
+	TilemapVertex *tilemapDrawPtr;
+	int tilemapDrawCount;
+	uint16_t *tilemapTilePtr;
+	int tilemapTileLineOffset;
 
 	virtual void setWindow(int width, int height, std::string name) = 0;
 	virtual bool shouldExit() = 0;
@@ -59,5 +61,6 @@ public:
 	virtual void startUpdateSprites() = 0;
 	virtual void startUpdateSpriteLookup() = 0;
 	virtual void startUpdatePalette() = 0;
-	virtual void startUpdateTilemaps() = 0;
+	virtual void startUpdateTilemapDraw() = 0;
+	virtual void startUpdateTilemapTiles(int tilemap, int& width, int& height) = 0;
 };

@@ -33,7 +33,9 @@ public:
 	virtual void startUpdateSprites();
 	virtual void startUpdateSpriteLookup();
 	virtual void startUpdatePalette();
-	virtual void startUpdateTilemaps();
+	virtual void startUpdateTilemapDraw();
+	virtual void startUpdateTilemapTiles(int tilemap, int& width, int& height);
+
 private:
 	HINSTANCE hInstance;
 	HINSTANCE hPrevInst;
@@ -57,6 +59,7 @@ private:
 	ID3D11Texture2D* spritesTex;
 	ID3D11Texture2D* spriteLookupTex;
 	ID3D11Texture1D* paletteTex;
+	ID3D11Texture2D* copyTex;
 	ID3D11RenderTargetView* backRTV;
 	ID3D11RenderTargetView* indexRTV;
 	ID3D11ShaderResourceView* indexRV;
@@ -121,6 +124,7 @@ private:
 	void mapPalette();
 	void mapLookup();
 	void mapTilemaps();
+	void mapTilemapsTex(int x, int y, int w, int h);
 	void endLoadSprites();
 
 	void endLoadMaps();
@@ -132,6 +136,12 @@ private:
 	std::vector<int> spritesToLoadWidth;
 	std::vector<int> spritesToLoadHeight;
 
+	std::vector<int> tilemapWidth;
+	std::vector<int> tilemapHeight;
+	std::vector<int> tilemapAtlasXTable;
+	std::vector<int> tilemapAtlasYTable;
+
 	std::vector<std::string> mapsToLoad;
 	int tilemapLoadCount;
+	int mappedTilemap;
 };
