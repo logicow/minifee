@@ -13,7 +13,7 @@
 
 #define D3DCALL(x) if(x != S_OK) { std::string s = "D3D call fail at line " + std::to_string(__LINE__) + " in file " + std::string(__FILE__) + std::string("\n"); OutputDebugString(s.c_str()); }
 
-int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
+int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true, uint32_t* out_palette = nullptr);
 
 class winGraphics : Graphics
 {

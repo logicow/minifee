@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include "slide.h"
+
 Game::Game(Graphics *aGraphics, Gamepad *aGamepad, winSynth *aSynth)
 {
 	graphics = aGraphics;
@@ -39,7 +41,7 @@ void Game::update()
 	}
 	previousPressed2 = gamepad->pressed[gamepadButton::B];
 
-	graphics->startUpdateSprites();
+	
 	static double f = 0;
 	f += 200.0 * graphics->frameTime;
 	if (f >= 320.0) {
@@ -59,7 +61,6 @@ void Game::update()
 
 	graphics->spriteCount = 2;
 
-	graphics->startUpdateTilemapDraw();
 	graphics->tilemapDrawPtr[0].pos = DirectX::XMFLOAT2((float)px * -2.0f, (float)py * -2.0f);
 	graphics->tilemapDrawPtr[0].tilemap_index = 0;
 	graphics->tilemapDrawCount = 1;
@@ -77,40 +78,53 @@ void Game::update()
 	
 }
 
-#include "winSynth.h"
 int Game::run()
 {
 	graphics->setWindow(320, 200, "Minifee");
 	
 	graphics->startLoad();
-	graphics->loadSpriteRect("small", 0, 0, 16, 16, false);
 	graphics->loadSprite("title", false);
+	graphics->loadSpriteRect("small", 0, 0, 16, 16, false);
 
 	graphics->loadMap("sewers");
 
 	graphics->endLoad();
 
-	graphics->startUpdatePalette();
-	for (int i = 0; i < 256; i++) {
-		graphics->palettePtr[i] = 0xFF000000 | (i * 0x123456);
-	}
+	//graphics->startUpdatePalette();
+	//for (int i = 0; i < 256; i++) {
+	//	graphics->palettePtr[i] = 0xFF000000 | (i * 0x123456);
+	//}
 
 	graphics->startUpdateSpriteLookup();
 	for (int i = 0; i < 256; i++) {
 		graphics->spriteLookupPtr[i] = i;
 	}
-	for (int i = 0; i < 256; i++) {
-		graphics->spriteLookupPtr[256 + i] = i == 0 ? 0 : 255 - i;
-	}
+	//for (int i = 0; i < 256; i++) {
+	//	graphics->spriteLookupPtr[256 + i] = i == 0 ? 0 : 255 - i;
+	//}
 
-	synth->loadXM("coolio");
-	synth->playXM(0);
+	//synth->loadXM("coolio");
+	//synth->playXM(0);
+
+	gameState state;
+	state.graphics = graphics;
+	state.gamepad = gamepad;
+	state.synth = synth;
+
+	startSlide(0, state);
 
 	int frameC = 0;
 	while (!graphics->shouldExit())
 	{
 		gamepad->update();
-		update();
+
+		graphics->startUpdateSprites();
+		graphics->startUpdateTilemapDraw();
+
+		//update();
+
+		state.updatePtr(state);
+
 		graphics->swap();
 		graphics->frameTime;
 		Sleep(0);

@@ -66,6 +66,9 @@
     <ClCompile Include="engine\winGraphicsMaps.cpp">
       <Filter>Source Files\Engine\windows</Filter>
     </ClCompile>
+    <ClCompile Include="slide.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -94,6 +97,12 @@
     </ClInclude>
     <ClInclude Include="engine\dxDescriptions.h">
       <Filter>Source Files\Engine\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="slide.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gameState.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

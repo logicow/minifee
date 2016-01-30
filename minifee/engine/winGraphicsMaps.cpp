@@ -252,7 +252,10 @@ void winGraphics::endLoadMaps()
 		unsigned long tilemapWidth;
 		unsigned long tilemapHeight;
 
-		decodePNG(tilemapData, tilemapWidth, tilemapHeight, &pngData[0], (unsigned long)pngData.size(), false);
+		std::vector<uint32_t> pal;
+		pal.resize(256);
+		decodePNG(tilemapData, tilemapWidth, tilemapHeight, &pngData[0], (unsigned long)pngData.size(), false, &pal[0]);
+		palettes.push_back(pal);
 
 		int srcCols = tilemapWidth / tileWidth;
 		int srcRows = tilemapHeight / tileHeight;

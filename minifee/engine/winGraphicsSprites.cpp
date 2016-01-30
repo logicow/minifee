@@ -84,7 +84,10 @@ void winGraphics::endLoadSprites()
 			std::vector<unsigned char> pngData;
 			loadFile(pngData, path);
 
-			decodePNG(spriteData, spriteWidth, spriteHeight, &pngData[0], (unsigned long)pngData.size(), false);
+			std::vector<uint32_t> pal;
+			pal.resize(256);
+			decodePNG(spriteData, spriteWidth, spriteHeight, &pngData[0], (unsigned long)pngData.size(), false, &pal[0]);
+			palettes.push_back(pal);
 		}
 		
 		if (spritesToLoadWidth[i] <= 0 || spritesToLoadWidth[i] > (int)spriteWidth - spritesToLoadX[i]) {

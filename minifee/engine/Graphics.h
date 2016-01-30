@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <DirectXMath.h>
+#include <vector>
 
 #define MAX_SPRITES 4096
 
@@ -46,6 +47,8 @@ public:
 	int tilemapDrawCount;
 	uint16_t *tilemapTilePtr;
 	int tilemapTileLineOffset;
+
+	std::vector<std::vector<uint32_t>> palettes;
 
 	virtual void setWindow(int width, int height, std::string name) = 0;
 	virtual bool shouldExit() = 0;

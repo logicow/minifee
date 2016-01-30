@@ -164,6 +164,7 @@
     <ClCompile Include="engine\winGraphicsSprites.cpp" />
     <ClCompile Include="engine\winSynth.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="slide.cpp" />
     <ClCompile Include="winMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +177,8 @@
     <ClInclude Include="engine\winGraphics.h" />
     <ClInclude Include="engine\winSynth.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="gameState.h" />
+    <ClInclude Include="slide.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\indexed_to_rgba_ps.hlsl">
