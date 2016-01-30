@@ -10,8 +10,8 @@ struct VSOut
 
 uint main(VSOut vs) : SV_TARGET
 {
-	uint tile_width = 24;
-	uint tile_height = 24;
+	uint tile_width = 16;
+	uint tile_height = 16;
 
 	uint tile = tilemap_texture.Load(int3(vs.tc, 0));
 

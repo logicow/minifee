@@ -40,8 +40,8 @@ float4 main( float4 pos : POSITION ) : SV_POSITION
 VSOut main(VSIn In)
 {
 	VSOut Out;
-	uint tile_width = 24;
-	uint tile_height = 24;
+	uint tile_width = 16;
+	uint tile_height = 16;
 
 	uint tilemap_id = In.vertex_id >> 2;
 	uint atlas_id = tilemaps[tilemap_id].index;
