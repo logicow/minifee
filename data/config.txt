@@ -1,7 +1,7 @@
 fullscreen = false
 fullscreen_x = 1920
 fullscreen_y = 1080
-window_x_max = 1200
+window_x_max = 1600
 window_y_max = 1000
 window_integer = true
 window_keep_aspect = true

@@ -10,7 +10,7 @@ struct VSOut
 
 uint main(VSOut vs) : SV_TARGET
 {
-	uint sprite_color = sprites_texture.Load(int3(vs.tc, 0));
+	uint sprite_color = sprites_texture.Load(int3(vs.tc.x, vs.tc.y, 0));
 	uint result = lookup_texture.Load(int3(sprite_color, vs.color_row, 0));
 	if (result == 0) {
 		discard;
