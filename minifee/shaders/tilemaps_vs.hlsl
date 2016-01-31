@@ -50,7 +50,7 @@ VSOut main(VSIn In)
 
 	Out.pos = float4(tilemaps[tilemap_id].pos + pos_in_tilemap * float2(tile_width, tile_height), 0.0f, 1.0f);
 
-	Out.tc = atlas[atlas_id].src_pos + pos_in_tilemap;
+	Out.tc = atlas[atlas_id].src_pos + pos_in_tilemap + 0.0001f;
 
 	Out.pos = float4(
 		(pos_in_tilemap.x * tile_width + tilemaps[tilemap_id].pos.x) * (2.0f / 320.0f) - 1.0f,
