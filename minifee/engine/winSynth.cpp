@@ -108,8 +108,8 @@ winSynth::winSynth(Config *config)
 	running = false;
 	xmFile = nullptr;
 	xmMixBuffer = nullptr;
-	xmVolume = 1.0f;
-	noteVolume = 1.0f;
+	xmVolume = 2.0f;
+	noteVolume = 0.02f;
 }
 
 void threadFunc(void *synthObj)
@@ -301,11 +301,13 @@ winSynth::~winSynth()
 
 int winSynth::loadXM(std::string name)
 {
-	std::string path = "../data/xm/" + name + ".xm";
+	std::string path = "xm/" + name + ".xm";
 
 	XM_Song* songPtr;
 
 	songPtr = xm_song_alloc();
+
+	//xm_loader_set_recompress_all_samples(xm_true);
 
 	xm_loader_open_song(path.c_str(), songPtr);
 
@@ -315,6 +317,11 @@ int winSynth::loadXM(std::string name)
 
 void winSynth::playXM(int i)
 {
+	if (i < 0 || i > xmSongs.size()) {
+		xm_player_stop();
+		return;
+	}
+
 	xm_player_set_song(xmSongs[i]);
 	xm_player_play();
 }

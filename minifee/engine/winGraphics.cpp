@@ -15,6 +15,7 @@ winGraphics::winGraphics(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLi
 	spriteLookupPtr = nullptr;
 	
 	tilemapLoadCount = 0;
+	mappedTilemap = -1;
 
 	frameTime = 0;
 	QueryPerformanceFrequency((LARGE_INTEGER*)&intervalFrequency);
@@ -191,7 +192,7 @@ void winGraphics::createPalette()
 
 void winGraphics::loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DESC* input_element_description, int num_elements, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout)
 {
-	std::string path = "../data/shaders/" + filename + ".cso";
+	std::string path = "shaders/" + filename + ".cso";
 	std::vector<unsigned char> fileData;
 	loadFile(fileData, path);
 	D3DCALL(device->CreateVertexShader(&fileData[0], (SIZE_T)fileData.size(), NULL, vertex_shader));
@@ -201,7 +202,7 @@ void winGraphics::loadVertexShader(std::string filename, D3D11_INPUT_ELEMENT_DES
 
 void winGraphics::loadPixelShader(std::string filename, ID3D11PixelShader** pixel_shader)
 {
-	std::string path = "../data/shaders/" + filename + ".cso";
+	std::string path = "shaders/" + filename + ".cso";
 	std::vector<unsigned char> fileData;
 	loadFile(fileData, path);
 	D3DCALL(device->CreatePixelShader(&fileData[0], (SIZE_T)fileData.size(), NULL, pixel_shader));

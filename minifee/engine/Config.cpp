@@ -11,15 +11,18 @@ Config::Config()
 	if (file.seekg(0, std::ios::end).good()) size = file.tellg();
 	if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
 
+	//if (size <= 0) {
+	//	file = std::ifstream("config.txt", std::ios::in | std::ios::binary | std::ios::ate);
+	//	size = 0;
+	//	if (file.seekg(0, std::ios::end).good()) size = file.tellg();
+	//	if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
+	//
+	//	if (size <= 0) {
+	//		return;
+	//	}
+	//}
 	if (size <= 0) {
-		file = std::ifstream("../data/config.txt", std::ios::in | std::ios::binary | std::ios::ate);
-		size = 0;
-		if (file.seekg(0, std::ios::end).good()) size = file.tellg();
-		if (file.seekg(0, std::ios::beg).good()) size -= file.tellg();
-
-		if (size <= 0) {
-			return;
-		}
+		return;
 	}
 
 	std::vector<char> buffer;

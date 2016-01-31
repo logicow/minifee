@@ -14,7 +14,7 @@ int winGraphics::loadMap(std::string name)
 
 	int initialCount = tilemapLoadCount;
 
-	std::string path = "../data/maps/" + name + ".tmx";
+	std::string path = "maps/" + name + ".tmx";
 
 	std::vector<unsigned char> tmxData;
 	loadFile(tmxData, path);
@@ -51,7 +51,7 @@ void winGraphics::endLoadMaps()
 
 	for (int i = 0; i < (int)mapsToLoad.size(); i++) {
 
-		std::string path = "../data/maps/" + mapsToLoad[i] + ".tmx";
+		std::string path = "maps/" + mapsToLoad[i] + ".tmx";
 
 		std::vector<unsigned char> tmxData;
 		loadFile(tmxData, path);
@@ -243,7 +243,7 @@ void winGraphics::endLoadMaps()
 
 	for (int i = 0; i < tilesetFilename.size(); i++) {
 
-		std::string path = "../data/maps/" + tilesetFilename[i];
+		std::string path = "maps/" + tilesetFilename[i];
 
 		std::vector<unsigned char> pngData;
 		loadFile(pngData, path);
@@ -252,7 +252,10 @@ void winGraphics::endLoadMaps()
 		unsigned long tilemapWidth;
 		unsigned long tilemapHeight;
 
-		decodePNG(tilemapData, tilemapWidth, tilemapHeight, &pngData[0], (unsigned long)pngData.size(), false);
+		std::vector<uint32_t> pal;
+		pal.resize(256);
+		decodePNG(tilemapData, tilemapWidth, tilemapHeight, &pngData[0], (unsigned long)pngData.size(), false, &pal[0]);
+		palettes.push_back(pal);
 
 		int srcCols = tilemapWidth / tileWidth;
 		int srcRows = tilemapHeight / tileHeight;
@@ -311,20 +314,6 @@ void winGraphics::callTiles()
 		tilemapDrawPtr = nullptr;
 	}
 
-	if (tilemapTilePtr) {
-		context->Unmap(copyTex, 0);
-		D3D11_BOX region;
-		region.back = 1;
-		region.front = 0;
-		region.left = tilemapAtlasXTable[mappedTilemap];
-		region.right = tilemapAtlasXTable[mappedTilemap] + tilemapWidth[mappedTilemap];
-		region.top = tilemapAtlasYTable[mappedTilemap];
-		region.bottom = tilemapAtlasYTable[mappedTilemap] + tilemapHeight[mappedTilemap];
-		context->CopySubresourceRegion(tilemapTex, 0, region.left, region.top, 0, copyTex, 0, &region);
-
-		tilemapDrawPtr = nullptr;
-	}
-
 	UINT stride = sizeof(DirectX::XMFLOAT2);
 	UINT offset = 0;
 	ID3D11ShaderResourceView* views[2];
@@ -379,11 +368,27 @@ void winGraphics::mapTilemapsTex(int x, int y, int w, int h)
 	tilemapTilePtr = (uint16_t*)mappedTilemapTexBuffer.pData;
 }
 
-void winGraphics::startUpdateTilemapTiles(int tilemap, int& width, int& height)
+void winGraphics::readTilemapTiles(int tilemap, int& width, int& height)
 {
 	width = tilemapWidth[tilemap];
 	height = tilemapHeight[tilemap];
+	tilemapTileLineOffset = 1024;
 
+	if (mappedTilemap == tilemap) {
+		return;
+	}
+
+	if (tilemapTilePtr) {
+		context->Unmap(copyTex, 0);
+		tilemapDrawPtr = nullptr;
+	}
+	mapTilemapsTex(tilemapAtlasXTable[tilemap], tilemapAtlasYTable[tilemap], width, height);
+	mappedTilemap = tilemap;
+
+}
+
+void winGraphics::writeTilemapTiles()
+{
 	if (tilemapTilePtr) {
 		context->Unmap(copyTex, 0);
 		D3D11_BOX region;
@@ -397,7 +402,4 @@ void winGraphics::startUpdateTilemapTiles(int tilemap, int& width, int& height)
 
 		tilemapDrawPtr = nullptr;
 	}
-	mapTilemapsTex(tilemapAtlasXTable[tilemap], tilemapAtlasYTable[tilemap], width, height);
-	mappedTilemap = tilemap;
-	tilemapTileLineOffset = 1024;
 }

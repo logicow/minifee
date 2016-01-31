@@ -1,5 +1,9 @@
 #include "Game.h"
 
+#include "slide.h"
+#include "action.h"
+#include "gameState.h"
+
 Game::Game(Graphics *aGraphics, Gamepad *aGamepad, winSynth *aSynth)
 {
 	graphics = aGraphics;
@@ -39,7 +43,7 @@ void Game::update()
 	}
 	previousPressed2 = gamepad->pressed[gamepadButton::B];
 
-	graphics->startUpdateSprites();
+	
 	static double f = 0;
 	f += 200.0 * graphics->frameTime;
 	if (f >= 320.0) {
@@ -59,13 +63,12 @@ void Game::update()
 
 	graphics->spriteCount = 2;
 
-	graphics->startUpdateTilemapDraw();
 	graphics->tilemapDrawPtr[0].pos = DirectX::XMFLOAT2((float)px * -2.0f, (float)py * -2.0f);
 	graphics->tilemapDrawPtr[0].tilemap_index = 0;
 	graphics->tilemapDrawCount = 1;
 
 	int width, height;
-	graphics->startUpdateTilemapTiles(0, width, height);
+	graphics->readTilemapTiles(0, width, height);
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
 			if ((x + y) & 1) {
@@ -73,46 +76,130 @@ void Game::update()
 			}
 		}
 	}
-	
+	graphics->writeTilemapTiles();
 	
 }
 
-#include "winSynth.h"
 int Game::run()
 {
-	graphics->setWindow(320, 200, "Minifee");
+	graphics->setWindow(320, 200, "Deadspooker");
 	
 	graphics->startLoad();
-	graphics->loadSpriteRect("small", 0, 0, 16, 16, false);
-	graphics->loadSprite("title", false);
+	
+	gameState state;
+	state.graphics = graphics;
+	state.gamepad = gamepad;
+	state.synth = synth;
 
-	graphics->loadMap("sewers");
+	graphics->loadSprite("title", false);
+	graphics->loadSprite("intro", false);
+	graphics->loadSprite("win", false);
+
+	for (int i = 0; i < 8; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i*16, 0, 16, 16, false);
+		state.idx_player = idx - i;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 16, 16, 16, false);
+		state.idx_spark = idx - i;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 32, 16, 16, false);
+		state.idx_playerBulletFocus = idx - i;
+	}
+
+	for (int i = 0; i < 6; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 48, 16, 16, false);
+		state.idx_enemySkellinton = idx - i;
+	}
+
+	for (int i = 0; i < 6; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 16 * 6 + i * 32, 32, 32, 32, false);
+		state.idx_enemyLargeSkellinton = idx - i;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 64, 16, 16, false);
+		state.idx_pentagram = idx - i;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 16 * 4 + i * 32, 64, 32, 32, false);
+		state.idx_largePentagram = idx - i;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 80, 16, 16, false);
+		state.idx_drum = idx - i;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 96, 16, 16, false);
+		state.idx_guitar = idx - i;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 112, 16, 16, false);
+		state.idx_microphone = idx - i;
+	}
+
+	for (int i = 0; i < 1; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 16 * 3 + i * 16, 96, 32, 32, false);
+		state.idx_bubble = idx - i;
+	}
+
+	for (int i = 0; i < 6; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 16, 128, 16, 16, false);
+		state.idx_enemyDemon = idx - i;
+	}
+
+	for (int i = 0; i < 6; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 16 * 6 + i * 32, 112, 32, 32, false);
+		state.idx_enemyLargeDemon = idx - i;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 0 + i * 6, 144, 6, 6, false);
+		state.idx_enemyBulletShot = idx - i;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int idx = graphics->loadSpriteRect("sheet", 24 + i * 12, 144, 12, 12, false);
+		state.idx_enemyBulletLargeShot = idx - i;
+	}
+
+	graphics->loadMap("stage");
 
 	graphics->endLoad();
-
-	graphics->startUpdatePalette();
-	for (int i = 0; i < 256; i++) {
-		graphics->palettePtr[i] = 0xFF000000 | (i * 0x123456);
-	}
 
 	graphics->startUpdateSpriteLookup();
 	for (int i = 0; i < 256; i++) {
 		graphics->spriteLookupPtr[i] = i;
 	}
 	for (int i = 0; i < 256; i++) {
-		graphics->spriteLookupPtr[256 + i] = i == 0 ? 0 : 255 - i;
+		graphics->spriteLookupPtr[256 + i] = i == 0 ? 0 : 5 - i;
 	}
 
-	synth->loadXM("coolio");
+	synth->loadXM("YRRU");
 	synth->playXM(0);
 
+	startSlide(0, state);
+
+	//startAction(0, state);
+
 	int frameC = 0;
-	while (!graphics->shouldExit())
+	while (!graphics->shouldExit() && state.updatePtr != nullptr)
 	{
 		gamepad->update();
-		update();
+
+		graphics->startUpdateSprites();
+		graphics->startUpdateTilemapDraw();
+
+		state.updatePtr(state);
+
 		graphics->swap();
-		graphics->frameTime;
 		Sleep(0);
 	}
 	return 0;

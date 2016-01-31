@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Engine\chibi-xmplayer">
       <UniqueIdentifier>{d3059bc0-30d7-4f6c-83c9-ed1c5cdbfb81}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects">
+      <UniqueIdentifier>{47dbf0af-f02b-4957-9198-a239ca3f0a0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -66,6 +69,51 @@
     <ClCompile Include="engine\winGraphicsMaps.cpp">
       <Filter>Source Files\Engine\windows</Filter>
     </ClCompile>
+    <ClCompile Include="slide.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\Player.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\PlayerBulletFocus.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\PlayerBulletSpark.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyBulletPentagram.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemySkellinton.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyBubble.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyBand.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyDevil.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyBulletShot.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyBulletLargePentagram.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyLargeSkellinton.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyLargeDevil.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\EnemyBulletLargeShot.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -94,6 +142,63 @@
     </ClInclude>
     <ClInclude Include="engine\dxDescriptions.h">
       <Filter>Source Files\Engine\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="slide.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gameState.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="action.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\Player.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\PlayerBullet.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\Enemy.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyBullet.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\PlayerBulletFocus.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\PlayerBulletSpark.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyBulletPentagram.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemySkellinton.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyBubble.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyBand.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyDevil.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyBulletShot.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyBulletLargePentagram.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyLargeSkellinton.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyLargeDevil.h">
+      <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\EnemyBulletLargeShot.h">
+      <Filter>Source Files\objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

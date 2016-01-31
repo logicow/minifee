@@ -313,7 +313,7 @@ static void _xm_sw_voice_set_volume(xm_u8 p_voice,xm_u8 p_vol) {
 	if (!m->voices[p_voice].active)
 		return;
 
-	m->voices[p_voice].volume=p_vol;
+	m->voices[p_voice].volume=p_vol / 4; //AAAAAA HACK POCHE
 }
 static void _xm_sw_voice_set_pan(xm_u8 p_voice,xm_u8 p_pan) {
 

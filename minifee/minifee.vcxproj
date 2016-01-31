@@ -82,7 +82,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Small|Win32'">
+    <TargetName>Deadspooker</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>Deadspooker</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>Deadspooker</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -154,6 +162,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="action.cpp" />
     <ClCompile Include="engine\chibi-xmplay-master\xmplay.c" />
     <ClCompile Include="engine\Config.cpp" />
     <ClCompile Include="engine\dxDescriptions.cpp" />
@@ -164,9 +173,24 @@
     <ClCompile Include="engine\winGraphicsSprites.cpp" />
     <ClCompile Include="engine\winSynth.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="objects\EnemyBand.cpp" />
+    <ClCompile Include="objects\EnemyBubble.cpp" />
+    <ClCompile Include="objects\EnemyBulletLargePentagram.cpp" />
+    <ClCompile Include="objects\EnemyBulletLargeShot.cpp" />
+    <ClCompile Include="objects\EnemyBulletPentagram.cpp" />
+    <ClCompile Include="objects\EnemyBulletShot.cpp" />
+    <ClCompile Include="objects\EnemyDevil.cpp" />
+    <ClCompile Include="objects\EnemyLargeDevil.cpp" />
+    <ClCompile Include="objects\EnemyLargeSkellinton.cpp" />
+    <ClCompile Include="objects\EnemySkellinton.cpp" />
+    <ClCompile Include="objects\Player.cpp" />
+    <ClCompile Include="objects\PlayerBulletFocus.cpp" />
+    <ClCompile Include="objects\PlayerBulletSpark.cpp" />
+    <ClCompile Include="slide.cpp" />
     <ClCompile Include="winMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="action.h" />
     <ClInclude Include="engine\chibi-xmplay-master\xmplay.h" />
     <ClInclude Include="engine\Config.h" />
     <ClInclude Include="engine\dxDescriptions.h" />
@@ -176,6 +200,24 @@
     <ClInclude Include="engine\winGraphics.h" />
     <ClInclude Include="engine\winSynth.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="gameState.h" />
+    <ClInclude Include="objects\Enemy.h" />
+    <ClInclude Include="objects\EnemyBand.h" />
+    <ClInclude Include="objects\EnemyBubble.h" />
+    <ClInclude Include="objects\EnemyBullet.h" />
+    <ClInclude Include="objects\EnemyBulletLargePentagram.h" />
+    <ClInclude Include="objects\EnemyBulletLargeShot.h" />
+    <ClInclude Include="objects\EnemyBulletPentagram.h" />
+    <ClInclude Include="objects\EnemyBulletShot.h" />
+    <ClInclude Include="objects\EnemyDevil.h" />
+    <ClInclude Include="objects\EnemyLargeDevil.h" />
+    <ClInclude Include="objects\EnemyLargeSkellinton.h" />
+    <ClInclude Include="objects\EnemySkellinton.h" />
+    <ClInclude Include="objects\Player.h" />
+    <ClInclude Include="objects\PlayerBullet.h" />
+    <ClInclude Include="objects\PlayerBulletFocus.h" />
+    <ClInclude Include="objects\PlayerBulletSpark.h" />
+    <ClInclude Include="slide.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\indexed_to_rgba_ps.hlsl">
