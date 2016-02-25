@@ -20,4 +20,5 @@ void winGamepad::update()
 	pressed[gamepadButton::Y] = (GetAsyncKeyState(0x58) & ~1) != 0;
 	pressed[gamepadButton::START] = (GetAsyncKeyState(VK_RETURN) & ~1) != 0;
 	pressed[gamepadButton::SELECT] = (GetAsyncKeyState(VK_TAB) & ~1) != 0;
+	pressed[gamepadButton::QUIT] = (GetAsyncKeyState(VK_ESCAPE) & ~1) != 0;
 }

@@ -201,6 +201,10 @@ int Game::run()
 
 		graphics->swap();
 		Sleep(0);
+
+		if (gamepad->pressed[gamepadButton::QUIT]) {
+			state.updatePtr = nullptr;
+		}
 	}
 	return 0;
 }

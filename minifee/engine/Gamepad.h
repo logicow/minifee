@@ -13,6 +13,7 @@ enum gamepadButton {
 	SELECT,
 	L,
 	R,
+	QUIT,
 	COUNT
 };
 
